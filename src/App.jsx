@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 // Import các trang nội dung
 import Dashboard from './pages/Dashboard';
 import Ideas from './pages/Ideas/Ideas';
+import CategoryPage from './pages/CategoryPage';
 
 function App() {
   return (
@@ -20,6 +21,10 @@ function App() {
           
           {/* Khi click vào link /ideas -> Hiển thị Ideas vào chỗ Outlet */}
           <Route path="ideas" element={<Ideas />} />
+          
+          {/* Khi click vào link /categories -> Hiển thị CategoryPage vào chỗ Outlet */}
+          <Route path="categories" element={<CategoryPage />} />
+
         </Route>
       </Routes>
     </Router>
