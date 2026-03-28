@@ -22,7 +22,7 @@ const CategoryPage = () => {
             const data = await getCategories();
             setCategories(data.categories || data.items || data);
         } catch (error) {
-            console.error("Lỗi lấy dữ liệu:", error);
+            console.error("Data retrieval error:", error);
         } finally {
             setLoading(false);
         }
@@ -43,17 +43,17 @@ const CategoryPage = () => {
             setNewName(""); setNewDesc("");
             fetchData(); // Tải lại dữ liệu
         } catch (error) {
-            alert("Có lỗi xảy ra! Vui lòng kiểm tra lại.");
+            alert("An error occurred! Please check your input.");
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
+        if (window.confirm("Are you sure you want to delete this category?")) {
             try {
                 await deleteCategory(id);
                 setCategories(categories.filter(cat => cat.id !== id));
             } catch (error) {
-                alert("Không thể xóa danh mục đang có dữ liệu!");
+                alert("An error occurred while deleting the category!");
             }
         }
     };

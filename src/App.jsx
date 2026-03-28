@@ -1,19 +1,33 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// Import component Bố cục tổng thể
+import Layout from './components/Layout';
+// Import các trang nội dung
 import Dashboard from './pages/Dashboard';
-import CategoryPage from './pages/CategoryPage'; // Nhớ import file của bạn
+import Ideas from './pages/Ideas/Ideas';
+import CategoryPage from './pages/CategoryPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    // Bắt buộc bao quanh toàn bộ bằng Router
+    <Router>
       <Routes>
-        {/* Nếu người dùng gõ link gốc, tự động bẻ lái sang trang Dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        
-        {/* Khai báo các con đường (URL) */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/categories" element={<CategoryPage />} />
+        {/* 1. Định nghĩa Layout cha (Có chứa Sidebar) */}
+        <Route path="/" element={<Layout />}>
+          {/* Khi người dùng gõ link gốc '/' -> Tự động nhảy sang '/dashboard' */}
+          <Route index element={<Navigate to="/dashboard" />} />
+          
+          {/* Khi click vào link /dashboard -> Hiển thị Dashboard vào chỗ Outlet */}
+          <Route path="dashboard" element={<Dashboard />} />
+          
+          {/* Khi click vào link /ideas -> Hiển thị Ideas vào chỗ Outlet */}
+          <Route path="ideas" element={<Ideas />} />
+          
+          {/* Khi click vào link /categories -> Hiển thị CategoryPage vào chỗ Outlet */}
+          <Route path="categories" element={<CategoryPage />} />
+
+        </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
