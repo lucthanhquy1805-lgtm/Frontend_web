@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { getDashboardSummary } from '../services/dashboardService';
 import { Lightbulb, Users, MessageSquare, Hash, UserPlus, FileText, CheckCircle, FolderPlus } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import './Dashboard.css'; // Sẽ tạo ở Bước 3
+import { useNavigate } from 'react-router-dom';
+import './Dashboard.css'; 
+
 
 const Dashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,8 +39,13 @@ const Dashboard = () => {
             </div>
 
             {/* --- TOP 4 KPI CARDS --- */}
-            <div className="kpi-grid">
-                <div className="kpi-card">
+           <div className="kpi-grid">
+                {/* THẺ TOTAL IDEAS ĐÃ ĐƯỢC GẮN ONCLICK VÀ CURSOR POINTER */}
+                <div 
+                    className="kpi-card" 
+                    onClick={() => navigate('/ideas')} 
+                    style={{ cursor: 'pointer' }}
+                >
                     <div className="kpi-icon-wrapper bg-blue"><Lightbulb size={24} color="#fff" /></div>
                     <div className="kpi-info">
                         <h2>{data.totalIdeas}</h2>
