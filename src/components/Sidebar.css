@@ -1,0 +1,54 @@
+.sidebar {
+    width: 260px; /* Độ rộng menu */
+    background-color: #ffffff; /* Nền trắng */
+    height: 100vh; /* Cao hết màn hình */
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: fixed; /* Cố định bên trái */
+    left: 0;
+    top: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 40px; /* Khoảng cách dưới logo */
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Khoảng cách giữa các mục menu */
+}
+
+/* CSS cho mục menu lúc bình thường */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    text-decoration: none; /* Bỏ gạch chân link */
+    color: #64748b; /* Màu chữ xám Figma */
+    border-radius: 10px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* CSS cho mục menu khi ĐƯỢC CHỌN (Active) - Chuẩn Figma */
+.nav-item.active {
+    background-color: #dbeafe; /* Màu nền xanh nhạt */
+    color: #3b82f6; /* Màu chữ xanh đậm */
+    font-weight: 600;
+}

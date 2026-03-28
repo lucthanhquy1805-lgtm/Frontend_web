@@ -1,0 +1,10 @@
+.layout-container {
+    display: flex;
+}
+
+.main-content {
+    flex: 1; /* Lấy phần còn lại của màn hình bên phải */
+    margin-left: 260px; /* Chừa chỗ cho Sidebar cố định (phải khớp width Sidebar) */
+    background-color: #f8fafc; /* Nền xám nhạt nhẹ nhàng Figma */
+    min-height: 100vh;
+}
