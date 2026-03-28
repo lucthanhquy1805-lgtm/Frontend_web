@@ -101,7 +101,7 @@ const CategoryPage = () => {
                 />
             </div>
 
-            {/* KPI CARDS (Dùng lại class của cộng sự) */}
+            {/* KPI CARDS  */}
             <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                 <div className="kpi-card">
                     <div className="kpi-icon-wrapper bg-blue"><Folder color="white" size={24} /></div>
@@ -166,7 +166,7 @@ const CategoryPage = () => {
                 </table>
             </div>
 
-            {/* MODAL GIỮ NGUYÊN HOẶC TỰ STYLE THÊM SAU */}
+            {/* MODAL */}
             {isModalOpen && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
                     <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '12px', width: '400px' }}>
