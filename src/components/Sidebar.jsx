@@ -10,6 +10,7 @@ const Sidebar = () => {
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'All Ideas', path: '/ideas', icon: <Lightbulb size={20} /> },
+        { name: 'Categories', path: '/categories', icon: <Lightbulb size={20} /> },
     ];
 
     return (
