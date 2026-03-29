@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Eye, ThumbsUp, ThumbsDown, MessageSquare, Clock3 } from 'lucide-react';
-import { getIdeas, getCategoriesLookup, getTopicsLookup, getDepartmentsLookup } from '../../services/ideasService'; 
+import { Search, Plus, Eye, ThumbsUp, ThumbsDown, MessageSquare, Clock3, X, Edit, Trash2,Upload } from 'lucide-react';
+import { getIdeas, getCategoriesLookup, getTopicsLookup, getDepartmentsLookup, addIdea, updateIdea, deleteIdea } from '../../services/ideasService';
 import './Ideas.css'; 
+import { useNavigate } from 'react-router-dom';
 
 const IdeasPage = () => {
     // 1. State Dữ liệu
     const [ideas, setIdeas] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+    const navigate = useNavigate();
     // 2. State cho các ô Dropdown
     const [categoriesList, setCategoriesList] = useState([]); 
     const [topicsList, setTopicsList] = useState([]);       
@@ -19,8 +20,21 @@ const IdeasPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedTopic, setSelectedTopic] = useState('');
     const [selectedDepartment, setSelectedDepartment] = useState('');
+    
+    // --- STATE CHO MODAL ADD IDEA ---
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingIdeaId, setEditingIdeaId] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0); 
+    const [newIdea, setNewIdea] = useState({
+        title: '',
+        content: '',
+        categoryId: '',
+        topicId: '',
+        isAnonymous: false,
+        file: null
+    });
 
-    // --- EFFECT 1: Load dữ liệu Danh mục & Phòng ban lúc mới vào trang ---
+    // --- EFFECT 1: Load dữ liệu Danh mục & Phòng ban ---
     useEffect(() => {
         const loadInitialData = async () => {
             const cats = await getCategoriesLookup();
@@ -31,7 +45,7 @@ const IdeasPage = () => {
         loadInitialData();
     }, []);
 
-    // --- EFFECT 2: Xử lý logic CHỌN DANH MỤC -> LOAD CHỦ ĐỀ TƯƠNG ỨNG ---
+    // --- EFFECT 2: Xử lý logic CHỌN DANH MỤC -> LOAD CHỦ ĐỀ ---
     useEffect(() => {
         const loadTopics = async () => {
             if (selectedCategory === '') {
@@ -39,7 +53,6 @@ const IdeasPage = () => {
                 setTopicsList(allTopics);
                 return; 
             }
-            // Reset ô Topic về rỗng khi đổi Danh mục khác
             setSelectedTopic(''); 
             const filteredTopics = await getTopicsLookup(selectedCategory);
             setTopicsList(filteredTopics);
@@ -47,7 +60,7 @@ const IdeasPage = () => {
         loadTopics();
     }, [selectedCategory]);
 
-    // --- EFFECT 3: Gọi API lấy Ideas mỗi khi bộ lọc thay đổi ---
+    // --- EFFECT 3: Gọi API lấy Ideas (ĐÃ THÊM refreshKey) ---
     useEffect(() => {
         const fetchIdeasData = async () => {
             setLoading(true);
@@ -61,9 +74,59 @@ const IdeasPage = () => {
             }
         };
 
-        const delay = setTimeout(() => { fetchIdeasData(); }, 500); // Đợi gõ xong mới tìm
+        const delay = setTimeout(() => { fetchIdeasData(); }, 500); 
         return () => clearTimeout(delay);
-    }, [searchTerm, selectedCategory, selectedTopic, selectedDepartment, sortBy]);
+    }, [searchTerm, selectedCategory, selectedTopic, selectedDepartment, sortBy, refreshKey]); // Thêm refreshKey ở đây
+
+    // --- HÀM XỬ LÝ LƯU IDEA MỚI ---
+   const handleAddIdeaSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const payloadToSend = {
+                ...newIdea,
+                categoryId: parseInt(newIdea.categoryId),
+                topicId: parseInt(newIdea.topicId)
+            };
+
+            if (editingIdeaId) {
+                // NẾU CÓ ID -> GỌI API SỬA
+                await updateIdea(editingIdeaId, payloadToSend);
+                alert("✏️ Sửa ý tưởng thành công!");
+            } else {
+                // NẾU KHÔNG CÓ ID -> GỌI API THÊM
+                await addIdea(payloadToSend);
+                alert("🎉 Thêm ý tưởng thành công!");
+            }
+
+            setIsAddModalOpen(false); 
+            setEditingIdeaId(null); // Reset trạng thái sửa
+            setRefreshKey(oldKey => oldKey + 1); 
+            setNewIdea({ title: '', content: '', categoryId: '', topicId: '', isAnonymous: false }); 
+        } catch (error) {
+            alert("❌ Có lỗi xảy ra, vui lòng mở F12 xem chi tiết!");
+        }
+    };
+    const handleEditClick = (idea) => {
+        setEditingIdeaId(idea.id);
+        setNewIdea({
+            title: idea.title,
+            content: idea.content,
+            categoryId: idea.categoryId,
+            topicId: idea.topicId,
+            isAnonymous: idea.isAnonymous || false
+        });
+        setIsAddModalOpen(true);
+    };
+    const handleDeleteClick = async (id) => {
+        if (window.confirm("🗑️ Bạn có chắc chắn muốn xóa ý tưởng này vĩnh viễn không?")) {
+            try {
+                await deleteIdea(id);
+                setRefreshKey(oldKey => oldKey + 1); // Load lại danh sách
+            } catch (error) {
+                alert("❌ Lỗi không thể xóa!");
+            }
+        }
+    };
 
     return (
         <div className="ideas-page-container">
@@ -82,7 +145,10 @@ const IdeasPage = () => {
                     </div>
                 </div>
                 <div className="header-right">
-                    <button className="add-idea-btn"><Plus size={20} /> Add Idea</button>
+                    {/* ĐÃ THÊM SỰ KIỆN ONCLICK ĐỂ MỞ MODAL */}
+                    <button className="add-idea-btn" onClick={() => setIsAddModalOpen(true)}>
+                        <Plus size={20} /> Add Idea
+                    </button>
                     <div className="user-avatar-placeholder">U</div>
                 </div>
             </header>
@@ -126,7 +192,14 @@ const IdeasPage = () => {
                 <section className="ideas-grid">
                     {ideas.length > 0 ? ideas.map((idea) => (
                         <div className="idea-card" key={idea.id}>
-                            <span className="category-tag">{idea.categoryName}</span>
+                            
+                            <div className="idea-card-header">
+                                <span className="category-tag">{idea.categoryName}</span>
+                                <div className="card-actions">
+                                    <button onClick={() => handleEditClick(idea)} className="edit-btn"><Edit size={16} /></button>
+                                    <button onClick={() => handleDeleteClick(idea.id)} className="delete-btn"><Trash2 size={16} /></button>
+                                </div>
+                            </div>
                             <h3 className="idea-card-title">{idea.title}</h3>
                             <p className="idea-card-content">{idea.content.substring(0, 100)}...</p>
                             
@@ -139,6 +212,7 @@ const IdeasPage = () => {
                                 <span className="topic-tag">{idea.topicName}</span>
                             </div>
                             
+                            {/* KHU VỰC THỐNG KÊ (HÀNG 1) */}
                             <div className="stats-row">
                                 <div className="stats-left">
                                     <div className="stat-item"><Eye size={16} /> {idea.viewCount}</div>
@@ -146,9 +220,19 @@ const IdeasPage = () => {
                                     <div className="stat-item"><ThumbsDown size={16} /> {idea.thumbsDownCount}</div>
                                     <div className="stat-item"><MessageSquare size={16} /> {idea.commentCount}</div>
                                 </div>
+                            </div>
+                            
+                            {/* KHU VỰC NGÀY THÁNG VÀ NÚT XEM CHI TIẾT (HÀNG 2 - MỚI) */}
+                            <div className="card-footer-action">
                                 <div className="stat-date">
                                     <Clock3 size={16} /> {new Date(idea.createdAt).toLocaleDateString()}
                                 </div>
+                                <button 
+                                    className="view-details-btn"
+                                    onClick={() => navigate(`/ideas/${idea.id}`)}
+                                >
+                                    View Details
+                                </button>
                             </div>
                         </div>
                     )) : (
@@ -157,6 +241,96 @@ const IdeasPage = () => {
                         </div>
                     )}
                 </section>
+            )}
+
+            {/* === GIAO DIỆN MODAL ADD IDEA CHÈN VÀO ĐÂY === */}
+            {isAddModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Create New Idea</h2>
+                            <button className="close-btn" onClick={() => setIsAddModalOpen(false)}><X size={24} /></button>
+                        </div>
+                        <form onSubmit={handleAddIdeaSubmit} className="modal-form">
+                            <div className="form-group">
+                                <label>Title <span className="text-red-500">*</span></label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    placeholder="Enter idea title..." 
+                                    value={newIdea.title}
+                                    onChange={(e) => setNewIdea({...newIdea, title: e.target.value})}
+                                />
+                            </div>
+                            
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Category <span className="text-red-500">*</span></label>
+                                    <select required value={newIdea.categoryId} onChange={(e) => setNewIdea({...newIdea, categoryId: e.target.value})}>
+                                        <option value="">Select Category</option>
+                                        {categoriesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Topic <span className="text-red-500">*</span></label>
+                                    <select required value={newIdea.topicId} onChange={(e) => setNewIdea({...newIdea, topicId: e.target.value})}>
+                                        <option value="">Select Topic</option>
+                                        {topicsList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Description <span className="text-red-500">*</span></label>
+                                <textarea 
+                                    required 
+                                    rows="5" 
+                                    placeholder="Describe your idea in detail..."
+                                    value={newIdea.content}
+                                    onChange={(e) => setNewIdea({...newIdea, content: e.target.value})}
+                                ></textarea>
+                            </div>
+                            {/* KHU VỰC TẢI FILE - CHUẨN FIGMA */}
+                            <div className="form-group">
+                                <label>Attach Supporting Documents</label>
+                                <div className="file-upload-area">
+                                    <input 
+                                        type="file" 
+                                        id="idea-file" 
+                                        className="file-input-hidden"
+                                        onChange={(e) => setNewIdea({...newIdea, file: e.target.files[0]})}
+                                    />
+                                    <label htmlFor="idea-file" className="file-upload-label">
+                                        <Upload size={28} color="#3b82f6" />
+                                        <span className="upload-title">Choose Files</span>
+                                        <span className="upload-subtitle">PDF, DOC, DOCX, TXT, PNG, JPG (Max 10MB per file)</span>
+                                    </label>
+                                </div>
+                                {/* Hiển thị tên file nếu người dùng đã chọn */}
+                                {newIdea.file && (
+                                    <div className="selected-file">
+                                        📄 Đã chọn: <strong>{newIdea.file.name}</strong>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    id="isAnonymous" 
+                                    checked={newIdea.isAnonymous}
+                                    onChange={(e) => setNewIdea({...newIdea, isAnonymous: e.target.checked})}
+                                />
+                                <label htmlFor="isAnonymous">Post Anonymously (Ẩn danh)</label>
+                            </div>
+
+                            <div className="modal-footer">
+                                <button type="button" className="cancel-btn" onClick={() => setIsAddModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="submit-btn">Submit Idea</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );
