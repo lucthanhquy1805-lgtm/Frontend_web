@@ -5,7 +5,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Ideas from './pages/Ideas/Ideas';
 import CategoryPage from './pages/CategoryPage';
-import IdeaDetails from './pages/IdeaDetails/IdeaDetails';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -17,8 +17,6 @@ function App() {
           {/* Khi người dùng gõ link gốc '/' -> Tự động nhảy sang '/dashboard' */}
           <Route index element={<Navigate to="/dashboard" />} />
           
-          <Route path="/ideas/:id" element={<IdeaDetails />} />
-          
           {/* Khi click vào link /dashboard -> Hiển thị Dashboard vào chỗ Outlet */}
           <Route path="dashboard" element={<Dashboard />} />
           
@@ -27,6 +25,8 @@ function App() {
           
           {/* Khi click vào link /categories -> Hiển thị CategoryPage vào chỗ Outlet */}
           <Route path="categories" element={<CategoryPage />} />
+
+          <Route path="users" element={<Users />} />
 
         </Route>
       </Routes>
