@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CheckCircle2, Lightbulb } from 'lucide-react';
 import './Login.css';
 import { loginUser } from '../../services/ideasService';
@@ -11,25 +11,33 @@ const Login = () => {
     const [errorMsg, setErrorMsg] = useState('');
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        setErrorMsg(''); // Xóa lỗi cũ khi bắt đầu bấm nút
+    e.preventDefault();
+    setErrorMsg(''); 
 
-        try {
-            // 1. Gọi API gửi Email và Password xuống C#
-            const userData = await loginUser(email, password);
-            
-            // 2. Nếu thành công -> Lưu thông vị User vào bộ nhớ trình duyệt (Giống như phát thẻ từ)
-            localStorage.setItem('currentUser', JSON.stringify(userData));
+    try {
+        
+        const userData = await loginUser(email, password);
+        
+      
+        localStorage.setItem('currentUser', JSON.stringify(userData));
 
-            // 3. Thông báo thành công và đá vào trang Dashboard
-            alert(`Xin chào ${userData.fullName}! Đăng nhập thành công.`);
+       
+        alert(`Xin chào ${userData.fullName}! Đăng nhập thành công.`);
+
+       
+        if (userData.roleId === 1) {
+           
             navigate('/dashboard');
-
-        } catch (error) {
-            // Nếu thất bại (Lỗi 401), hiện thông báo lỗi chữ đỏ lên form
-            setErrorMsg(error.message);
+        } else {
+           
+            navigate('/user-dashboard');
         }
-    };
+
+    } catch (error) {
+     
+        setErrorMsg(error.message);
+    }
+};
 
     return (
         <div className="login-container">
@@ -126,8 +134,8 @@ const Login = () => {
                     </form>
 
                     <div className="contact-admin">
-                        Don't have an account? <a href="#">Contact Administrator</a>
-                    </div>
+                    Don't have an account? <Link to="/register" style={{ color: '#1e40af', fontWeight: '600' }}>Sign Up here</Link>
+                </div>
                     <div className="terms">
                         By signing in, you agree to our Terms of Service and Privacy Policy
                     </div>

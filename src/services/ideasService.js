@@ -57,32 +57,13 @@ export const getDepartmentsLookup = async () => {
     }
 };
 
-// === HÀM THÊM IDEA MỚI ĐÃ CHUYỂN SANG DẠNG FORMDATA ĐỂ GỬI FILE ===
-export const addIdea = async (ideaData) => {
+// =========================================================
+// 🔥 ĐÃ SỬA: HÀM THÊM IDEA MỚI 
+// Nhận trực tiếp FormData từ Ideas.jsx gửi sang, không cần tạo lại nữa
+// =========================================================
+export const addIdea = async (formDataPayload) => {
     try {
-        // 1. Tạo một cái hộp FormData (multipart/form-data)
-        const formData = new FormData();
-
-        // 2. Nhét hết các trường chữ vào hộp
-        formData.append('title', ideaData.title);
-        formData.append('content', ideaData.content);
-        formData.append('categoryId', ideaData.categoryId);
-        formData.append('topicId', ideaData.topicId);
-        formData.append('isAnonymous', ideaData.isAnonymous);
-        
-        // Gắn cứng (Gắn ID User và ID Năm học tạm thời)
-        formData.append('userId', 1); 
-        formData.append('academicYearId', 1);
-
-        // 3. NHÉT CỤC FILE VÀO HỘP (NẾU NGƯỜI DÙNG CÓ CHỌN FILE)
-        if (ideaData.file) {
-            // Trường tên là 'File' phải KHỚP CHÍNH XÁC với tên trường 'File' trong CreateIdeaDto.cs của Backend
-            formData.append('File', ideaData.file); 
-        }
-
-        // 4. Gửi cái hộp FormData này lên API bằng lệnh POST
-        const response = await axios.post(`${API_BASE_URL}/Ideas`, formData, {
-            // 💡 QUAN TRỌNG: Phải đặt header là form-data thì Backend .NET mới nhận ra
+        const response = await axios.post(`${API_BASE_URL}/Ideas`, formDataPayload, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -93,11 +74,18 @@ export const addIdea = async (ideaData) => {
         throw error;
     }
 };
-// Hàm SỬA ý tưởng
-export const updateIdea = async (id, ideaData) => {
+
+// =========================================================
+// 🔥 ĐÃ SỬA: Hàm SỬA ý tưởng
+// Cập nhật để hỗ trợ gửi FormData (nếu sau này có sửa file)
+// =========================================================
+export const updateIdea = async (id, formDataPayload) => {
     try {
-        const payload = { ...ideaData, userId: 1, academicYearId: 1 };
-        const response = await axios.put(`${API_BASE_URL}/Ideas/${id}`, payload);
+        const response = await axios.put(`${API_BASE_URL}/Ideas/${id}`, formDataPayload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     } catch (error) {
         console.error("Lỗi khi sửa Idea:", error);
@@ -115,6 +103,7 @@ export const deleteIdea = async (id) => {
         throw error;
     }
 };
+
 export const getIdeaById = async (id) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/Ideas/${id}`);
@@ -124,14 +113,17 @@ export const getIdeaById = async (id) => {
         throw error;
     }
 };
+
 export const getCommentsByIdeaId = async (ideaId) => {
     const response = await axios.get(`${API_BASE_URL}/Ideas/${ideaId}/comments`);
     return response.data;
 };
+
 export const postComment = async (commentData) => {
     const response = await axios.post(`${API_BASE_URL}/Ideas/comments`, commentData);
     return response.data;
 };
+
 // Gửi API Like / Dislike
 export const reactToIdea = async (ideaId, reactionType, userId) => {
     try {
@@ -157,6 +149,7 @@ export const deleteComment = async (commentId) => {
         throw error;
     }
 };
+
 export const loginUser = async (email, password) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/Auth/login`, { email, password });
@@ -167,5 +160,28 @@ export const loginUser = async (email, password) => {
             throw new Error(error.response.data.message);
         }
         throw new Error("Lỗi kết nối tới máy chủ!");
+    }
+};
+
+export const registerUser = async (userData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/Auth/register`, userData);
+        return response.data;
+    } catch (error) {
+        // Bắt lỗi từ C# gửi lên (ví dụ: "Email này đã được sử dụng!")
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data); 
+        }
+        throw new Error("Lỗi kết nối tới máy chủ!");
+    }
+};
+export const getUserDashboardStats = async () => {
+    try {
+        // Gọi đến API Summary mà chúng ta vừa nâng cấp ở DashboardController
+        const response = await axios.get(`${API_BASE_URL}/Dashboard/summary`);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu Dashboard:", error);
+        throw error;
     }
 };

@@ -1,33 +1,66 @@
 import React from 'react';
-// Import Link để chuyển trang không bị load lại web, NavLink để biết đang ở trang nào
 import { NavLink } from 'react-router-dom'; 
-// Import icon đẹp giống Figma
-import { LayoutDashboard, Lightbulb } from 'lucide-react';
-import './Sidebar.css'; // Sẽ tạo CSS ở bước sau
+import { 
+    LayoutDashboard, 
+    Lightbulb, 
+    PlusCircle, 
+    UserCircle, 
+    Grid, 
+    Building, 
+    Users 
+} from 'lucide-react'; 
+import './Sidebar.css';
 
 const Sidebar = () => {
-    // Định nghĩa danh sách các mục Menu
+    // 1. Lấy thông tin User từ localStorage
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const isAdmin = user?.roleId === 1;
+
+    // 2. Định nghĩa Menu động dựa trên Role
     const menuItems = [
-        { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-        { name: 'All Ideas', path: '/ideas', icon: <Lightbulb size={20} /> },
-        { name: 'Categories', path: '/categories', icon: <Lightbulb size={20} /> },
+        { 
+            name: 'Dashboard', 
+            path: isAdmin ? '/dashboard' : '/user-dashboard', 
+            icon: <LayoutDashboard size={20} /> 
+        },
+        { 
+            name: 'All Ideas', 
+            path: '/ideas', 
+            icon: <Lightbulb size={20} /> 
+        },
     ];
+
+    // --- NẾU LÀ USER: Thêm Submit và My Ideas ---
+    if (!isAdmin) {
+        menuItems.push(
+            { name: 'Submit Idea', path: '/ideas', icon: <PlusCircle size={20} /> },
+            { name: 'My Ideas', path: '/my-ideas', icon: <UserCircle size={20} /> }
+        );
+    }
+
+    // --- NẾU LÀ ADMIN: Thêm Quản lý hệ thống ---
+    if (isAdmin) {
+        menuItems.push(
+            { name: 'Categories', path: '/categories', icon: <Grid size={20} /> },
+            { name: 'Departments', path: '/departments', icon: <Building size={20} /> },
+            { name: 'Manage Users', path: '/users', icon: <Users size={20} /> }
+        );
+    }
 
     return (
         <aside className="sidebar">
-            {/* Logo hoặc tên dự án trên cùng */}
+            {/* Logo dự án */}
             <div className="sidebar-logo">
                 <Lightbulb color="#3b82f6" size={28} />
                 <span>IdeaHub</span>
             </div>
             
-            {/* Danh sách các link chuyển trang */}
+            {/* Danh sách Menu */}
             <nav className="sidebar-nav">
                 {menuItems.map((item, index) => (
                     <NavLink 
                         key={index} 
                         to={item.path} 
-                        // class "active" tự động được thêm khi người dùng đang ở link đó
                         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                     >
                         {item.icon}
@@ -35,6 +68,8 @@ const Sidebar = () => {
                     </NavLink>
                 ))}
             </nav>
+            
+            {/* Đã xóa phần Logout ở đây để tránh trùng lặp! */}
         </aside>
     );
 };
