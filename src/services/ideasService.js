@@ -124,3 +124,48 @@ export const getIdeaById = async (id) => {
         throw error;
     }
 };
+export const getCommentsByIdeaId = async (ideaId) => {
+    const response = await axios.get(`${API_BASE_URL}/Ideas/${ideaId}/comments`);
+    return response.data;
+};
+export const postComment = async (commentData) => {
+    const response = await axios.post(`${API_BASE_URL}/Ideas/comments`, commentData);
+    return response.data;
+};
+// Gửi API Like / Dislike
+export const reactToIdea = async (ideaId, reactionType, userId) => {
+    try {
+        // Truyền thêm userId vào body gửi đi
+        const response = await axios.post(`${API_BASE_URL}/Ideas/${ideaId}/react`, { 
+            reactionType: reactionType,
+            userId: userId 
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi đánh giá ý tưởng:", error);
+        throw error;
+    }
+};
+
+// Xóa bình luận
+export const deleteComment = async (commentId) => {
+    try {
+        const response = await axios.delete(`${API_BASE_URL}/Ideas/comments/${commentId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi xóa bình luận:", error);
+        throw error;
+    }
+};
+export const loginUser = async (email, password) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/Auth/login`, { email, password });
+        return response.data; // Trả về thông tin User
+    } catch (error) {
+        // Lấy câu chửi "Email hoặc mật khẩu sai" từ C# trả về
+        if (error.response && error.response.status === 401) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error("Lỗi kết nối tới máy chủ!");
+    }
+};
