@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Eye, ThumbsUp, ThumbsDown, MessageSquare, Clock3, X, Edit, Trash2,Upload } from 'lucide-react';
+import { Search, Plus, Eye, ThumbsUp, ThumbsDown, MessageSquare, Clock3, X, Edit, Trash2, Upload } from 'lucide-react';
 import { getIdeas, getCategoriesLookup, getTopicsLookup, getDepartmentsLookup, addIdea, updateIdea, deleteIdea } from '../../services/ideasService';
 import './Ideas.css'; 
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ const IdeasPage = () => {
     const [ideas, setIdeas] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    
     // 2. State cho các ô Dropdown
     const [categoriesList, setCategoriesList] = useState([]); 
     const [topicsList, setTopicsList] = useState([]);       
@@ -76,36 +77,57 @@ const IdeasPage = () => {
 
         const delay = setTimeout(() => { fetchIdeasData(); }, 500); 
         return () => clearTimeout(delay);
-    }, [searchTerm, selectedCategory, selectedTopic, selectedDepartment, sortBy, refreshKey]); // Thêm refreshKey ở đây
+    }, [searchTerm, selectedCategory, selectedTopic, selectedDepartment, sortBy, refreshKey]);
 
-    // --- HÀM XỬ LÝ LƯU IDEA MỚI ---
-   const handleAddIdeaSubmit = async (e) => {
+    // --- HÀM XỬ LÝ LƯU IDEA MỚI (ĐÃ SỬA ĐỂ TRUYỀN USER ID VÀ FILE) ---
+    const handleAddIdeaSubmit = async (e) => {
         e.preventDefault();
+
+        // 1. Lấy thông tin User đang đăng nhập từ LocalStorage
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert("Vui lòng đăng nhập để đăng bài!");
+            navigate('/login');
+            return;
+        }
+
         try {
-            const payloadToSend = {
-                ...newIdea,
-                categoryId: parseInt(newIdea.categoryId),
-                topicId: parseInt(newIdea.topicId)
-            };
+            // 2. Tạo FormData để gửi được File và Dữ liệu text chuẩn với C# [FromForm]
+            const formData = new FormData();
+            formData.append('title', newIdea.title);
+            formData.append('content', newIdea.content);
+            formData.append('categoryId', newIdea.categoryId);
+            formData.append('topicId', newIdea.topicId);
+            formData.append('isAnonymous', newIdea.isAnonymous);
+            
+            // 🔥 TỰ ĐỘNG GẮN ID CỦA NGƯỜI DÙNG VÀO ĐÂY
+            formData.append('userId', currentUser.id); 
+
+            // Nếu có chọn file thì đính kèm file vào
+            if (newIdea.file) {
+                formData.append('file', newIdea.file);
+            }
 
             if (editingIdeaId) {
                 // NẾU CÓ ID -> GỌI API SỬA
-                await updateIdea(editingIdeaId, payloadToSend);
+                await updateIdea(editingIdeaId, formData);
                 alert("✏️ Sửa ý tưởng thành công!");
             } else {
                 // NẾU KHÔNG CÓ ID -> GỌI API THÊM
-                await addIdea(payloadToSend);
+                await addIdea(formData);
                 alert("🎉 Thêm ý tưởng thành công!");
             }
 
             setIsAddModalOpen(false); 
-            setEditingIdeaId(null); // Reset trạng thái sửa
+            setEditingIdeaId(null); 
             setRefreshKey(oldKey => oldKey + 1); 
-            setNewIdea({ title: '', content: '', categoryId: '', topicId: '', isAnonymous: false }); 
+            setNewIdea({ title: '', content: '', categoryId: '', topicId: '', isAnonymous: false, file: null }); 
         } catch (error) {
+            console.error(error);
             alert("❌ Có lỗi xảy ra, vui lòng mở F12 xem chi tiết!");
         }
     };
+
     const handleEditClick = (idea) => {
         setEditingIdeaId(idea.id);
         setNewIdea({
@@ -113,10 +135,12 @@ const IdeasPage = () => {
             content: idea.content,
             categoryId: idea.categoryId,
             topicId: idea.topicId,
-            isAnonymous: idea.isAnonymous || false
+            isAnonymous: idea.isAnonymous || false,
+            file: null // Khi sửa tạm thời chưa load file cũ lên form
         });
         setIsAddModalOpen(true);
     };
+
     const handleDeleteClick = async (id) => {
         if (window.confirm("🗑️ Bạn có chắc chắn muốn xóa ý tưởng này vĩnh viễn không?")) {
             try {
@@ -145,11 +169,10 @@ const IdeasPage = () => {
                     </div>
                 </div>
                 <div className="header-right">
-                    {/* ĐÃ THÊM SỰ KIỆN ONCLICK ĐỂ MỞ MODAL */}
                     <button className="add-idea-btn" onClick={() => setIsAddModalOpen(true)}>
                         <Plus size={20} /> Add Idea
                     </button>
-                    <div className="user-avatar-placeholder">U</div>
+                    {/* Đã bỏ qua avatar giả ở đây vì bạn đã có Top Bar xịn xò ở Layout rồi */}
                 </div>
             </header>
 
@@ -205,7 +228,9 @@ const IdeasPage = () => {
                             
                             <div className="metadata-row">
                                 <div className="author-info">
-                                    <div className="author-avatar-small">A</div>
+                                    <div className="author-avatar-small">
+                                        {idea.authorName ? idea.authorName.charAt(0).toUpperCase() : 'A'}
+                                    </div>
                                     <span>{idea.authorName}</span>
                                 </div>
                                 <span className="department-tag">{idea.departmentName}</span>
@@ -290,7 +315,8 @@ const IdeasPage = () => {
                                     onChange={(e) => setNewIdea({...newIdea, content: e.target.value})}
                                 ></textarea>
                             </div>
-                            {/* KHU VỰC TẢI FILE - CHUẨN FIGMA */}
+
+                            {/* KHU VỰC TẢI FILE */}
                             <div className="form-group">
                                 <label>Attach Supporting Documents</label>
                                 <div className="file-upload-area">
@@ -306,7 +332,6 @@ const IdeasPage = () => {
                                         <span className="upload-subtitle">PDF, DOC, DOCX, TXT, PNG, JPG (Max 10MB per file)</span>
                                     </label>
                                 </div>
-                                {/* Hiển thị tên file nếu người dùng đã chọn */}
                                 {newIdea.file && (
                                     <div className="selected-file">
                                         📄 Đã chọn: <strong>{newIdea.file.name}</strong>

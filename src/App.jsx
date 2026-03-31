@@ -9,24 +9,28 @@ import Users from './pages/Users';
 import ExportData from './pages/ExportData';
 import Reports from './pages/Reports';
 import Topics from './pages/Topics';
+import IdeaDetails from './pages/IdeaDetails/IdeaDetails';
+import Login from './pages/Login/Login';
 
 function App() {
   return (
-    // Bắt buộc bao quanh toàn bộ bằng Router
     <Router>
       <Routes>
-        {/* 1. Định nghĩa Layout cha (Có chứa Sidebar) */}
+        
+        {/* 1. TRANG ĐỘC LẬP (KHÔNG CÓ SIDEBAR) */}
+        <Route path="/login" element={<Login />} />
+
+
+        {/* 2. CÁC TRANG BÊN TRONG HỆ THỐNG (CÓ SIDEBAR BAO BỌC) */}
         <Route path="/" element={<Layout />}>
-          {/* Khi người dùng gõ link gốc '/' -> Tự động nhảy sang '/dashboard' */}
-          <Route index element={<Navigate to="/dashboard" />} />
           
           {/* Khi click vào link /dashboard -> Hiển thị Dashboard vào chỗ Outlet */}
+          {/* 👇 ĐÃ SỬA DÒNG NÀY: VÀO WEB LÀ NHẢY RA TRANG LOGIN 👇 */}
+          <Route index element={<Navigate to="/login" replace />} />
+          
           <Route path="dashboard" element={<Dashboard />} />
-          
-          {/* Khi click vào link /ideas -> Hiển thị Ideas vào chỗ Outlet */}
           <Route path="ideas" element={<Ideas />} />
-          
-          {/* Khi click vào link /categories -> Hiển thị CategoryPage vào chỗ Outlet */}
+          <Route path="ideas/:id" element={<IdeaDetails />} /> 
           <Route path="categories" element={<CategoryPage />} />
 
           <Route path="users" element={<Users />} />
@@ -35,6 +39,7 @@ function App() {
           <Route path='Topics' element={<Topics />} />
 
         </Route>
+
       </Routes>
     </Router>
   );
