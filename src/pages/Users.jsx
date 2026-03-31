@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Plus } from "lucide-react";
 import getUserPageData from "../services/usersService";
+import { User, Shield } from "lucide-react";
 import "./Users.css";
 
 const Users = () => {
@@ -110,9 +111,12 @@ const Users = () => {
       </div>
 
       {/* STATS */}
+      {/* STATS */}
       <div className="users-stats">
         <div className="stat-card">
-          <div className="stat-icon blue"></div>
+          <div className="stat-icon blue">
+            <User size={20} />
+          </div>
           <div>
             <h2>{pageData.totalUsers}</h2>
             <p>Total Users</p>
@@ -120,7 +124,9 @@ const Users = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon green"></div>
+          <div className="stat-icon green">
+            <User size={20} />
+          </div>
           <div>
             <h2>{pageData.activeUsers}</h2>
             <p>Active Users</p>
@@ -128,7 +134,9 @@ const Users = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon purple"></div>
+          <div className="stat-icon purple">
+            <Shield size={20} />
+          </div>
           <div>
             <h2>{pageData.administrators}</h2>
             <p>Administrators</p>
@@ -136,7 +144,9 @@ const Users = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon orange"></div>
+          <div className="stat-icon orange">
+            <User size={20} />
+          </div>
           <div>
             <h2>{pageData.staffUsers}</h2>
             <p>Staff Users</p>
@@ -196,11 +206,10 @@ const Users = () => {
                   <td>{user.ideaCount}</td>
                   <td>
                     <span
-                      className={`status-badge ${
-                        user.status?.toLowerCase() === "active"
+                      className={`status-badge ${user.status?.toLowerCase() === "active"
                           ? "active"
                           : "inactive"
-                      }`}
+                        }`}
                     >
                       {user.status}
                     </span>

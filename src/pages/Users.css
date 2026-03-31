@@ -126,6 +126,9 @@
   height: 52px;
   border-radius: 16px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-icon.blue {
@@ -340,4 +343,10 @@
 
 .table-action-btn:hover {
   background: #dbeafe;
+}
+
+.stat-icon svg {
+  stroke: #ffffff;
+  width: 40px;
+  height: 40px;
 }

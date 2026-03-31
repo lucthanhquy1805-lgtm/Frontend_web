@@ -5,6 +5,7 @@
   box-sizing: border-box;
 }
 
+/* ===== HEADER ===== */
 .topics-header {
   display: flex;
   align-items: flex-start;
@@ -41,8 +42,15 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 10px 24px rgba(29, 78, 216, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.add-topic-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(29, 78, 216, 0.26);
+}
+
+/* ===== FILTERS ===== */
 .topics-filters {
   display: flex;
   align-items: center;
@@ -58,6 +66,7 @@
 
 .topics-search-box {
   flex: 1;
+  min-width: 240px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -78,17 +87,24 @@
 }
 
 .topics-filter-select {
-  min-width: 160px;
+  min-width: 180px;
   border: 1px solid #d1d5db;
   outline: none;
   background: #ffffff;
   color: #0f172a;
   font-size: 14px;
-  padding: 10px 12px;
+  padding: 11px 12px;
   border-radius: 12px;
   cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.topics-filter-select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+/* ===== STATS ===== */
 .topics-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -105,11 +121,17 @@
   align-items: center;
   gap: 14px;
   box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.topic-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
 }
 
 .topic-stat-icon {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -147,6 +169,7 @@
   font-weight: 500;
 }
 
+/* ===== TABLE ===== */
 .topics-table-wrapper {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -180,45 +203,62 @@
   font-size: 15px;
   color: #0f172a;
   border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+}
+
+.topics-table tbody tr:hover {
+  background: #f8fbff;
+  transition: 0.2s ease;
 }
 
 .topics-empty-state {
   text-align: center;
   color: #94a3b8;
   font-weight: 600;
-  padding: 32px 20px;
+  padding: 34px 20px;
 }
 
-.topics-preview-note {
-  margin-top: 12px;
-  font-size: 13px;
-  color: #94a3b8;
-}
-
+/* ===== TOPIC MAIN CELL ===== */
 .topic-row-main {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .topic-badge-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: #f3e8ff;
-  color: #9333ea;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #4f46e5;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
+.topic-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.topic-id {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* ===== BADGES ===== */
 .category-pill,
 .status-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 6px 11px;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -239,6 +279,29 @@
   color: #64748b;
 }
 
+/* ===== DESCRIPTION ===== */
+.topics-table td:nth-child(3) {
+  color: #475569;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* ===== IDEAS COUNT ===== */
+.ideas-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 11px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ===== ACTIONS ===== */
 .topic-actions {
   display: flex;
   align-items: center;
@@ -246,23 +309,36 @@
 }
 
 .topic-action-btn {
+  width: 34px;
+  height: 34px;
   border: none;
   background: transparent;
+  border-radius: 10px;
   cursor: pointer;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: 0.2s ease;
 }
 
 .topic-action-btn.edit {
   color: #2563eb;
 }
 
+.topic-action-btn.edit:hover {
+  background: #eff6ff;
+}
+
 .topic-action-btn.delete {
   color: #ef4444;
 }
 
+.topic-action-btn.delete:hover {
+  background: #fef2f2;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
   .topics-stats {
     grid-template-columns: 1fr;
@@ -301,7 +377,7 @@
   }
 
   .topics-table {
-    min-width: 900px;
+    min-width: 920px;
   }
 
   .add-topic-btn {
