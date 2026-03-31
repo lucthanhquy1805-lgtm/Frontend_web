@@ -1,4 +1,4 @@
-import React from 'react';
+
 // Import Link để chuyển trang không bị load lại web, NavLink để biết đang ở trang nào
 import { NavLink } from 'react-router-dom'; 
 // Import icon đẹp giống Figma
@@ -10,8 +10,11 @@ const Sidebar = () => {
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'All Ideas', path: '/ideas', icon: <Lightbulb size={20} /> },
+        { name: 'Reports', path: '/Reports', icon: <Lightbulb size={20} /> },   
+        { name: 'Topics', path: '/Topics', icon: <Lightbulb size={20} /> },   
         { name: 'Categories', path: '/categories', icon: <Lightbulb size={20} /> },
         { name: 'Users', path: '/users', icon: <Lightbulb size={20} /> },
+        { name: 'ExportData', path: '/ExportData', icon: <Lightbulb size={20} /> }, 
     ];
 
     return (

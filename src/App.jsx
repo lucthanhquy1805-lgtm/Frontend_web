@@ -6,6 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Ideas from './pages/Ideas/Ideas';
 import CategoryPage from './pages/CategoryPage';
 import Users from './pages/Users';
+import ExportData from './pages/ExportData';
+import Reports from './pages/Reports';
+import Topics from './pages/Topics';
 
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
           <Route path="categories" element={<CategoryPage />} />
 
           <Route path="users" element={<Users />} />
+          <Route path='ExportData' element={<ExportData />} />
+          <Route path='Reports' element={<Reports />} />
+          <Route path='Topics' element={<Topics />} />
 
         </Route>
       </Routes>

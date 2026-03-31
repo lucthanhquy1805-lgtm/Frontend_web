@@ -1,0 +1,529 @@
+.reports-page {
+  padding: 28px 32px;
+  background: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.reports-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.reports-header h1 {
+  margin: 0 0 8px;
+  font-size: 40px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.15;
+}
+
+.reports-header p {
+  margin: 0;
+  font-size: 18px;
+  color: #475569;
+}
+
+.export-report-btn {
+  border: none;
+  outline: none;
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+  color: #ffffff;
+  padding: 14px 22px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(29, 78, 216, 0.22);
+}
+
+.reports-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.report-stat-card,
+.chart-card,
+.report-table-card,
+.exception-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.report-stat-card {
+  padding: 24px;
+}
+
+.report-stat-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.report-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-stat-icon.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.report-stat-icon.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.report-stat-icon.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.report-stat-change {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.report-stat-change.green {
+  color: #16a34a;
+}
+
+.report-stat-card h2 {
+  margin: 0 0 6px;
+  font-size: 46px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.report-stat-card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.report-stat-card p {
+  margin: 0;
+  font-size: 15px;
+  color: #475569;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.chart-card {
+  padding: 20px 20px 24px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #1e3a8a;
+}
+
+.card-title-row h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.fake-bar-chart {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  height: 320px;
+  padding-top: 10px;
+}
+
+.bar-chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #64748b;
+  padding-bottom: 36px;
+}
+
+.bar-chart-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+}
+
+.bar-chart-grid-lines {
+  position: absolute;
+  inset: 0 0 36px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bar-chart-grid-lines span {
+  display: block;
+  border-top: 1px dashed #dbe2ea;
+}
+
+.bars-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+  padding-bottom: 36px;
+}
+
+.bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bar {
+  width: 100%;
+  max-width: 42px;
+  background: #253f93;
+  border-radius: 10px 10px 0 0;
+  min-height: 8px;
+}
+
+.bar-item span {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  height: 90px;
+}
+
+.pie-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 320px;
+}
+
+.fake-pie-chart {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #3b82f6 0% 20%,
+    #10b981 20% 37%,
+    #8b5cf6 37% 53%,
+    #f59e0b 53% 68%,
+    #ec4899 68% 81%,
+    #06b6d4 81% 92%,
+    #9ca3af 92% 100%
+  );
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 180px;
+}
+
+.legend-item {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.legend-item.blue {
+  color: #3b82f6;
+}
+
+.legend-item.green {
+  color: #10b981;
+}
+
+.legend-item.purple {
+  color: #8b5cf6;
+}
+
+.legend-item.orange {
+  color: #f59e0b;
+}
+
+.legend-item.pink {
+  color: #ec4899;
+}
+
+.legend-item.cyan {
+  color: #06b6d4;
+}
+
+.legend-item.gray {
+  color: #6b7280;
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 30px;
+}
+
+.report-table-card {
+  overflow: hidden;
+}
+
+.report-table-header {
+  padding: 20px 20px 18px;
+}
+
+.report-table-header h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.report-table-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table thead tr {
+  background: #f8fafc;
+}
+
+.report-table th {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #334155;
+  border-top: 1px solid #eef2f7;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.report-table td {
+  padding: 16px 20px;
+  font-size: 15px;
+  color: #0f172a;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.table-total-row td {
+  font-weight: 800;
+}
+
+.exception-section h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.exception-section > p {
+  margin: 0 0 18px;
+  font-size: 16px;
+  color: #475569;
+}
+
+.exception-card {
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.exception-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.exception-card.warning .exception-card-top {
+  background: #fff7ed;
+}
+
+.exception-card.info .exception-card-top {
+  background: #eff6ff;
+}
+
+.exception-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.exception-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exception-icon.warning {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.exception-icon.info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.exception-title-wrap h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.exception-title-wrap span {
+  font-size: 14px;
+  color: #475569;
+}
+
+.exception-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.exception-badge.warning {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.exception-badge.info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+@media (max-width: 1200px) {
+  .chart-grid,
+  .table-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pie-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .reports-page {
+    padding: 20px;
+  }
+
+  .reports-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reports-header h1 {
+    font-size: 32px;
+  }
+
+  .reports-header p {
+    font-size: 15px;
+  }
+
+  .reports-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .report-table-card,
+  .exception-card,
+  .chart-card {
+    overflow-x: auto;
+  }
+
+  .report-table {
+    min-width: 700px;
+  }
+
+  .fake-bar-chart {
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 600px) {
+  .export-report-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .fake-pie-chart {
+    width: 210px;
+    height: 210px;
+  }
+}
+
+.empty-chart {
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.empty-state-cell {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.exception-card.purple .exception-card-top {
+  background: #faf5ff;
+}
+
+.exception-icon.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.exception-badge.purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
