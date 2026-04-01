@@ -10,6 +10,10 @@ const IdeasPage = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     
+    // --- LẤY THÔNG TIN NGƯỜI DÙNG HIỆN TẠI ---
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const isAdmin = currentUser?.roleId === 1;
+    
     // 2. State cho các ô Dropdown
     const [categoriesList, setCategoriesList] = useState([]); 
     const [topicsList, setTopicsList] = useState([]);       
@@ -160,18 +164,21 @@ const IdeasPage = () => {
                     <h1>All Ideas</h1>
                     <div className="search-wrapper">
                         <Search className="search-icon" size={20} />
-                        <input 
+                      <input 
                             type="text" 
-                            placeholder="Search ideas..." 
+                            placeholder="Search by title, content, or author name..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
                 <div className="header-right">
-                    <button className="add-idea-btn" onClick={() => setIsAddModalOpen(true)}>
-                        <Plus size={20} /> Add Idea
-                    </button>
+                    {/* Chỉ Admin mới thấy nút Add Idea ở trang tổng */}
+                    {isAdmin && (
+                     <button className="add-idea-btn" onClick={() => setIsAddModalOpen(true)}>
+                            <Plus size={20} /> Add Idea
+                     </button>
+)}
                     {/* Đã bỏ qua avatar giả ở đây vì bạn đã có Top Bar xịn xò ở Layout rồi */}
                 </div>
             </header>
@@ -218,11 +225,16 @@ const IdeasPage = () => {
                             
                             <div className="idea-card-header">
                                 <span className="category-tag">{idea.categoryName}</span>
-                                <div className="card-actions">
-                                    <button onClick={() => handleEditClick(idea)} className="edit-btn"><Edit size={16} /></button>
-                                    <button onClick={() => handleDeleteClick(idea.id)} className="delete-btn"><Trash2 size={16} /></button>
-                                </div>
+                                
+                                {/* 👇 ĐÃ THÊM ĐIỀU KIỆN ẨN/HIỆN NÚT SỬA XÓA Ở ĐÂY 👇 */}
+                                {(isAdmin || currentUser?.id === idea.userId) && (
+                                    <div className="card-actions">
+                                        <button onClick={() => handleEditClick(idea)} className="edit-btn"><Edit size={16} /></button>
+                                        <button onClick={() => handleDeleteClick(idea.id)} className="delete-btn"><Trash2 size={16} /></button>
+                                    </div>
+                                )}
                             </div>
+                            
                             <h3 className="idea-card-title">{idea.title}</h3>
                             <p className="idea-card-content">{idea.content.substring(0, 100)}...</p>
                             

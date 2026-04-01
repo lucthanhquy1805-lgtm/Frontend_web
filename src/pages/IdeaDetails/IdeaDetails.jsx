@@ -181,12 +181,12 @@ const IdeaDetails = () => {
                                                 <span className="comment-time">{new Date(cmt.createdAt).toLocaleString()}</span>
                                             </div>
                                             
-                                            {/* 🔥 LOGIC MỚI: Chỉ Admin (roleId === 1) mới thấy nút Xóa */}
-                                            {currentUser?.roleId === 1 && (
+                                            {/* 🔥 LOGIC MỚI: Admin HOẶC Chủ bình luận mới thấy nút Xóa */}
+                                            {(currentUser?.roleId === 1 || currentUser?.id === cmt.userId) && (
                                                 <button 
                                                     onClick={() => handleDeleteComment(cmt.id)}
                                                     style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '5px' }}
-                                                    title="Xóa bình luận này (Quyền Admin)"
+                                                    title="Xóa bình luận này"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>

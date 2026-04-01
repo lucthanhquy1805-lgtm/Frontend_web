@@ -9,6 +9,8 @@ import IdeaDetails from './pages/IdeaDetails/IdeaDetails';
 import Login from './pages/Login/Login';
 import Register from './pages/Login/Register';
 import UserDashboard from './pages/User/UserDashboard';
+import SubmitIdea from './pages/Ideas/SubmitIdea';
+import MyIdeas from './pages/Ideas/MyIdeas';
 
 // --- 🛡️ COMPONENT BẢO VỆ ĐƯỜNG DẪN (PROTECTED ROUTE) ---
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -56,6 +58,16 @@ function App() {
               <UserDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/submit-idea" element={
+    <ProtectedRoute allowedRoles={[2, 3, 4, 5]}>
+        <SubmitIdea />
+    </ProtectedRoute>
+} />
+<Route path="/my-ideas" element={
+    <ProtectedRoute allowedRoles={[2, 3, 4, 5]}>
+        <MyIdeas />
+    </ProtectedRoute>
+} />
           
           {/* 🛡️ CHỈ DÀNH CHO ADMIN (RoleId = 1) */}
           <Route path="dashboard" element={
