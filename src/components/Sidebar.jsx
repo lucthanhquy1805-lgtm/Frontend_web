@@ -31,9 +31,10 @@ const Sidebar = () => {
     ];
 
     // --- NẾU LÀ USER: Thêm Submit và My Ideas ---
-    if (!isAdmin) {
+   if (!isAdmin) {
         menuItems.push(
-            { name: 'Submit Idea', path: '/ideas', icon: <PlusCircle size={20} /> },
+            // Đã sửa '/ideas' thành '/submit-idea'
+            { name: 'Submit Idea', path: '/submit-idea', icon: <PlusCircle size={20} /> }, 
             { name: 'My Ideas', path: '/my-ideas', icon: <UserCircle size={20} /> }
         );
     }

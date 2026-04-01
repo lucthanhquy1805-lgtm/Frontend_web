@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         return <Navigate to="/user-dashboard" replace />;
     }
 
-    // 4. Nếu mọi thứ Ok -> Cho phép vào trang
+   
     return children;
 };
 
