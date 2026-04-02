@@ -30,15 +30,15 @@ const Users = () => {
   const [submitError, setSubmitError] = useState("");
 
   const [formData, setFormData] = useState({
-  id: null,
-  fullName: "",
-  email: "",
-  passwordHash: "",
-  departmentId: "",
-  roleId: "",
-  isActive: true,
-});
-  /* Hardcode tạm, sau này thay bằng API Departments / Roles */
+    id: null,
+    fullName: "",
+    email: "",
+    passwordHash: "",
+    departmentId: "",
+    roleId: "",
+    isActive: true,
+  });
+
   const departmentsData = [
     { id: 1, name: "Faculty of IT" },
     { id: 2, name: "QA Department" },
@@ -96,16 +96,16 @@ const Users = () => {
   }, [pageData.users, searchTerm, selectedRole, selectedStatus]);
 
   const resetForm = () => {
-  setFormData({
-    id: null,
-    fullName: "",
-    email: "",
-    passwordHash: "",
-    departmentId: "",
-    roleId: "",
-    isActive: true,
-  });
-};
+    setFormData({
+      id: null,
+      fullName: "",
+      email: "",
+      passwordHash: "",
+      departmentId: "",
+      roleId: "",
+      isActive: true,
+    });
+  };
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
@@ -127,14 +127,14 @@ const Users = () => {
     const matchedRole = rolesData.find((item) => item.name === user.roleName);
 
     setFormData({
-  id: user.id,
-  fullName: user.fullName || "",
-  email: user.email || "",
-  passwordHash: "",
-  departmentId: matchedDepartment ? String(matchedDepartment.id) : "",
-  roleId: matchedRole ? String(matchedRole.id) : "",
-  isActive: user.status?.toLowerCase() === "active",
-});
+      id: user.id,
+      fullName: user.fullName || "",
+      email: user.email || "",
+      passwordHash: "",
+      departmentId: matchedDepartment ? String(matchedDepartment.id) : "",
+      roleId: matchedRole ? String(matchedRole.id) : "",
+      isActive: user.status?.toLowerCase() === "active",
+    });
 
     setSubmitError("");
     setIsEditModalOpen(true);
@@ -162,144 +162,138 @@ const Users = () => {
     }));
   };
 
- const handleAddUser = async (e) => {
-  e.preventDefault();
+  const handleAddUser = async (e) => {
+    e.preventDefault();
 
-  if (!formData.fullName.trim()) {
-    setSubmitError("Full name is required.");
-    return;
-  }
+    if (!formData.fullName.trim()) {
+      setSubmitError("Full name is required.");
+      return;
+    }
 
-  if (!formData.email.trim()) {
-    setSubmitError("Email is required.");
-    return;
-  }
+    if (!formData.email.trim()) {
+      setSubmitError("Email is required.");
+      return;
+    }
 
-  if (!formData.passwordHash.trim()) {
-    setSubmitError("Password is required.");
-    return;
-  }
+    if (!formData.passwordHash.trim()) {
+      setSubmitError("Password is required.");
+      return;
+    }
 
-  if (!formData.departmentId) {
-    setSubmitError("Please select a department.");
-    return;
-  }
+    if (!formData.departmentId) {
+      setSubmitError("Please select a department.");
+      return;
+    }
 
-  if (!formData.roleId) {
-    setSubmitError("Please select a role.");
-    return;
-  }
+    if (!formData.roleId) {
+      setSubmitError("Please select a role.");
+      return;
+    }
 
-  const selectedDepartment = departmentsData.find(
-    (item) => Number(item.id) === Number(formData.departmentId)
-  );
+    try {
+      setSubmitLoading(true);
+      setSubmitError("");
 
-  const selectedRole = rolesData.find(
-    (item) => Number(item.id) === Number(formData.roleId)
-  );
+      const payload = {
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        passwordHash: formData.passwordHash.trim(),
+        departmentId: Number(formData.departmentId),
+        roleId: Number(formData.roleId),
+        isActive: formData.isActive,
+      };
 
-  try {
-    setSubmitLoading(true);
-    setSubmitError("");
+      console.log("Create payload:", payload);
 
-    const payload = {
-      fullName: formData.fullName.trim(),
-      email: formData.email.trim(),
-      passwordHash: formData.passwordHash.trim(),
-      departmentId: Number(formData.departmentId),
-      roleId: Number(formData.roleId),
-      isActive: formData.isActive,
-      department: {
-        id: Number(formData.departmentId),
-        name: selectedDepartment?.name || "",
-      },
-      role: {
-        id: Number(formData.roleId),
-        name: selectedRole?.name || "",
-      },
-    };
+      await createUser(payload);
+      await fetchUsersPageData();
+      handleCloseAddModal();
+    } catch (err) {
+      console.error("Create user error:", err);
+      console.log("Create user response:", err?.response?.data);
 
-    console.log("Create payload:", payload);
+      const errors = err?.response?.data?.errors;
 
-    await createUser(payload);
-    await fetchUsersPageData();
-    handleCloseAddModal();
-  } catch (err) {
-    console.error("Create user error:", err);
-    console.log("Create user response:", err?.response?.data);
-
-    const errors = err?.response?.data?.errors;
-
-    setSubmitError(
-      errors?.["Department.Name"]?.[0] ||
-      errors?.["Role.Name"]?.[0] ||
-      errors?.Department?.[0] ||
-      errors?.Role?.[0] ||
-      errors?.PasswordHash?.[0] ||
-      errors?.Email?.[0] ||
-      errors?.FullName?.[0] ||
-      err?.response?.data?.message ||
-      err?.response?.data?.title ||
-      "Failed to create user."
-    );
-  } finally {
-    setSubmitLoading(false);
-  }
-};
+      setSubmitError(
+        errors?.PasswordHash?.[0] ||
+          errors?.Department?.[0] ||
+          errors?.Role?.[0] ||
+          errors?.Email?.[0] ||
+          errors?.FullName?.[0] ||
+          err?.response?.data?.message ||
+          err?.response?.data?.title ||
+          "Failed to create user."
+      );
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
 
   const handleEditUser = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.fullName.trim()) {
-    setSubmitError("Full name is required.");
-    return;
-  }
+    if (!formData.fullName.trim()) {
+      setSubmitError("Full name is required.");
+      return;
+    }
 
-  if (!formData.email.trim()) {
-    setSubmitError("Email is required.");
-    return;
-  }
+    if (!formData.email.trim()) {
+      setSubmitError("Email is required.");
+      return;
+    }
 
-  if (!formData.departmentId) {
-    setSubmitError("Please select a department.");
-    return;
-  }
+    if (!formData.departmentId) {
+      setSubmitError("Please select a department.");
+      return;
+    }
 
-  if (!formData.roleId) {
-    setSubmitError("Please select a role.");
-    return;
-  }
+    if (!formData.roleId) {
+      setSubmitError("Please select a role.");
+      return;
+    }
 
-  try {
-    setSubmitLoading(true);
-    setSubmitError("");
+    try {
+      setSubmitLoading(true);
+      setSubmitError("");
 
-    const payload = {
-      id: formData.id,
-      fullName: formData.fullName.trim(),
-      email: formData.email.trim(),
-      passwordHash: formData.passwordHash.trim() || "",
-      departmentId: Number(formData.departmentId),
-      isActive: formData.isActive,
-      roleId: Number(formData.roleId),
-    };
+      const payload = {
+        id: formData.id,
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        departmentId: Number(formData.departmentId),
+        roleId: Number(formData.roleId),
+        isActive: formData.isActive,
+      };
 
-    await updateUser(formData.id, payload);
-    await fetchUsersPageData();
-    handleCloseEditModal();
-  } catch (err) {
-    console.error("Update user error:", err);
-    console.log("Update user response:", err?.response?.data);
+      if (formData.passwordHash.trim()) {
+        payload.passwordHash = formData.passwordHash.trim();
+      }
 
-    setSubmitError(
-      err?.response?.data?.message ||
-      err?.response?.data?.title ||
-      "Failed to update user."
-    );
-  } finally {
-    setSubmitLoading(false);
-  }
-};
+      console.log("Update payload:", payload);
+
+      await updateUser(formData.id, payload);
+      await fetchUsersPageData();
+      handleCloseEditModal();
+    } catch (err) {
+      console.error("Update user error:", err);
+      console.log("Update user response:", err?.response?.data);
+
+      const errors = err?.response?.data?.errors;
+
+      setSubmitError(
+        errors?.PasswordHash?.[0] ||
+          errors?.Department?.[0] ||
+          errors?.Role?.[0] ||
+          errors?.Email?.[0] ||
+          errors?.FullName?.[0] ||
+          err?.response?.data?.message ||
+          err?.response?.data?.title ||
+          "Failed to update user."
+      );
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
 
   const handleDeleteUser = async (user) => {
     const confirmed = window.confirm(
@@ -359,8 +353,6 @@ const Users = () => {
             <option>QA Coordinator</option>
             <option>Staff</option>
           </select>
-
-
         </div>
       </div>
 
@@ -543,7 +535,7 @@ const Users = () => {
                   name="passwordHash"
                   value={formData.passwordHash}
                   onChange={handleChange}
-                  placeholder="Leave blank to keep current password"
+                  placeholder="Enter password"
                 />
               </div>
 
@@ -578,7 +570,6 @@ const Users = () => {
                   ))}
                 </select>
               </div>
-
 
               {submitError && <div className="user-form-error">{submitError}</div>}
 
@@ -649,8 +640,8 @@ const Users = () => {
                 <label>New Password</label>
                 <input
                   type="password"
-                  name="password"
-                  value={formData.password}
+                  name="passwordHash"
+                  value={formData.passwordHash}
                   onChange={handleChange}
                   placeholder="Leave blank to keep current password"
                 />

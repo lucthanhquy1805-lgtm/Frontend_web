@@ -56,7 +56,7 @@ const Topics = () => {
       });
     } catch (err) {
       setError("Failed to load topics data.");
-      console.error(err);
+      console.error("Fetch topics error:", err);
     } finally {
       setLoading(false);
     }
@@ -99,9 +99,9 @@ const Topics = () => {
   };
 
   const handleOpenAddModal = () => {
-    setIsAddModalOpen(true);
-    setSubmitError("");
     resetForm();
+    setSubmitError("");
+    setIsAddModalOpen(true);
   };
 
   const handleCloseAddModal = () => {
@@ -116,7 +116,7 @@ const Topics = () => {
     );
 
     setFormData({
-      id: topic.id,
+      id: Number(topic.id),
       name: topic.name || "",
       categoryId: matchedCategory ? String(matchedCategory.id) : "",
       description: topic.description || "",
@@ -149,8 +149,10 @@ const Topics = () => {
       return;
     }
 
-    if (!formData.categoryId) {
-      setSubmitError("Please select a category.");
+    const parsedCategoryId = Number(formData.categoryId);
+
+    if (!parsedCategoryId || Number.isNaN(parsedCategoryId)) {
+      setSubmitError("Please select a valid category.");
       return;
     }
 
@@ -159,22 +161,32 @@ const Topics = () => {
       setSubmitError("");
 
       const payload = {
+        id: 0,
         name: formData.name.trim(),
-        categoryId: Number(formData.categoryId),
+        categoryId: parsedCategoryId,
         description: formData.description.trim() || "",
         isActive: true,
       };
+
+      console.log("Create topic payload:", payload);
 
       await createTopic(payload);
       await fetchTopicsPageData();
       handleCloseAddModal();
     } catch (err) {
-      console.error(err);
-      setSubmitError(
-        err?.response?.data?.message ||
-          err?.response?.data?.title ||
-          "Failed to create topic."
-      );
+      console.error("Create topic error:", err?.response?.data || err);
+
+      const apiErrors = err?.response?.data?.errors;
+      if (apiErrors) {
+        const firstError = Object.values(apiErrors).flat()?.[0];
+        setSubmitError(firstError || "Failed to create topic.");
+      } else {
+        setSubmitError(
+          err?.response?.data?.message ||
+            err?.response?.data?.title ||
+            "Failed to create topic."
+        );
+      }
     } finally {
       setSubmitLoading(false);
     }
@@ -188,8 +200,16 @@ const Topics = () => {
       return;
     }
 
-    if (!formData.categoryId) {
-      setSubmitError("Please select a category.");
+    const parsedTopicId = Number(formData.id);
+    const parsedCategoryId = Number(formData.categoryId);
+
+    if (!parsedTopicId || Number.isNaN(parsedTopicId)) {
+      setSubmitError("Invalid topic ID.");
+      return;
+    }
+
+    if (!parsedCategoryId || Number.isNaN(parsedCategoryId)) {
+      setSubmitError("Please select a valid category.");
       return;
     }
 
@@ -198,23 +218,32 @@ const Topics = () => {
       setSubmitError("");
 
       const payload = {
-        id: formData.id,
+        id: parsedTopicId,
         name: formData.name.trim(),
-        categoryId: Number(formData.categoryId),
+        categoryId: parsedCategoryId,
         description: formData.description.trim() || "",
         isActive: true,
       };
 
-      await updateTopic(formData.id, payload);
+      console.log("Update topic payload:", payload);
+
+      await updateTopic(parsedTopicId, payload);
       await fetchTopicsPageData();
       handleCloseEditModal();
     } catch (err) {
-      console.error(err);
-      setSubmitError(
-        err?.response?.data?.message ||
-          err?.response?.data?.title ||
-          "Failed to update topic."
-      );
+      console.error("Update topic error:", err?.response?.data || err);
+
+      const apiErrors = err?.response?.data?.errors;
+      if (apiErrors) {
+        const firstError = Object.values(apiErrors).flat()?.[0];
+        setSubmitError(firstError || "Failed to update topic.");
+      } else {
+        setSubmitError(
+          err?.response?.data?.message ||
+            err?.response?.data?.title ||
+            "Failed to update topic."
+        );
+      }
     } finally {
       setSubmitLoading(false);
     }
@@ -232,7 +261,7 @@ const Topics = () => {
       await deleteTopic(topic.id);
       await fetchTopicsPageData();
     } catch (err) {
-      console.error(err);
+      console.error("Delete topic error:", err?.response?.data || err);
       alert(
         err?.response?.data?.message ||
           err?.response?.data?.title ||

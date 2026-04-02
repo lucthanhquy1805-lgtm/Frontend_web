@@ -1,8 +1,3 @@
-
-// Import Link để chuyển trang không bị load lại web, NavLink để biết đang ở trang nào
-
-import React from 'react';
-
 import { NavLink } from 'react-router-dom'; 
 import { 
     LayoutDashboard, 
@@ -11,9 +6,13 @@ import {
     UserCircle, 
     Grid, 
     Building, 
-    Users 
+    Users,
+    BarChart,
+    Tag,
+    Download,
 } from 'lucide-react'; 
 import './Sidebar.css';
+
 
 const Sidebar = () => {
     // 1. Lấy thông tin User từ localStorage
@@ -48,9 +47,9 @@ const menuItems = [
         menuItems.push(
             { name: 'Categories', path: '/categories', icon: <Grid size={20} /> },
             { name: 'Manage Users', path: '/users', icon: <Users size={20} /> },
-            { name: 'Reports', path: '/reports', icon: <Users size={20} /> },
-            { name: 'Topics', path: '/topics', icon: <Users size={20} /> }
-
+             { name: 'Reports', path: '/reports', icon: <BarChart size={20} /> },
+             { name: 'Topics', path: '/topics', icon: <Tag size={20} /> },
+             { name: 'Export Data', path: '/export-data', icon: <Download size={20} /> },
         );
     }
 

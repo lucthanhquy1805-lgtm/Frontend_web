@@ -55,6 +55,9 @@ function App() {
           
           {/* 👇 ĐÃ SỬA DÒNG NÀY: VÀO WEB LÀ NHẢY RA TRANG LOGIN 👇 */}
           <Route index element={<Navigate to="/login" replace />} />
+          <Route path="user-dashboard" element={<UserDashboard />} />
+          <Route path="submit-idea" element={<SubmitIdea />} />
+          <Route path="my-ideas" element={<MyIdeas />} />
           
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="ideas" element={<Ideas />} />
@@ -62,9 +65,9 @@ function App() {
           <Route path="categories" element={<CategoryPage />} />
 
           <Route path="users" element={<Users />} />
-          <Route path='ExportData' element={<ExportData />} />
-          <Route path='Reports' element={<Reports />} />
-          <Route path='Topics' element={<Topics />} />
+          <Route path="export-data" element={<ExportData />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="topics" element={<Topics />} />
 
         </Route>
 
