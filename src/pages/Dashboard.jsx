@@ -5,7 +5,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
 
-
 const Dashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -41,11 +40,7 @@ const Dashboard = () => {
             {/* --- TOP 4 KPI CARDS --- */}
            <div className="kpi-grid">
                 {/* THẺ TOTAL IDEAS ĐÃ ĐƯỢC GẮN ONCLICK VÀ CURSOR POINTER */}
-                <div 
-                    className="kpi-card" 
-                    onClick={() => navigate('/ideas')} 
-                    style={{ cursor: 'pointer' }}
-                >
+                <div className="kpi-card" >
                     <div className="kpi-icon-wrapper bg-blue"><Lightbulb size={24} color="#fff" /></div>
                     <div className="kpi-info">
                         <h2>{data.totalIdeas}</h2>
@@ -119,17 +114,17 @@ const Dashboard = () => {
             {/* --- BOTTOM SECTION: MANAGEMENT TOOLS (Static for now) --- */}
             <h3 className="section-title">Management Tools</h3>
             <div className="tools-grid">
-                <div className="tool-card">
+                <div className="tool-card" onClick={() => navigate('/users')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-blue"><Users size={20} color="#2563eb" /></div>
                     <h4>Manage Users</h4>
                     <p>Add, edit, and manage user accounts</p>
                 </div>
-                <div className="tool-card">
+                <div className="tool-card" onClick={() => navigate('/categories')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-green"><FolderPlus size={20} color="#16a34a" /></div>
                     <h4>Manage Categories</h4>
                     <p>Organize idea categories</p>
                 </div>
-                <div className="tool-card">
+                <div className="tool-card" onClick={() => navigate('/topics')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-purple"><Hash size={20} color="#9333ea" /></div>
                     <h4>Manage Topics</h4>
                     <p>Create and edit discussion topics</p>
