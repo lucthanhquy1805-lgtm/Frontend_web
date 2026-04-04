@@ -7,6 +7,7 @@ import {
   deleteTopic,
 } from "../services/topicsService";
 import "./Topics.css";
+import { getCategories } from '../services/categoryService';
 
 const Topics = () => {
   const [pageData, setPageData] = useState({
@@ -33,13 +34,10 @@ const Topics = () => {
     name: "",
     categoryId: "",
     description: "",
+    isActive: true, 
   });
 
-  const categoriesData = [
-    { id: 1, name: "Technology" },
-    { id: 2, name: "Facilities" },
-    { id: 3, name: "Student Life" },
-  ];
+  const [categoriesData, setCategoriesData] = useState([]);
 
   const fetchTopicsPageData = async () => {
     try {
@@ -64,6 +62,23 @@ const Topics = () => {
 
   useEffect(() => {
     fetchTopicsPageData();
+  }, []);
+
+  // HÀM MỚI: Đi lấy danh sách Category thật từ Backend
+  const fetchCategoriesList = async () => {
+    try {
+      const data = await getCategories();
+      // Bóc tách dữ liệu giống như cách bạn làm ở trang CategoryPage
+      setCategoriesData(data.categories || data.items || data);
+    } catch (error) {
+      console.error("Lỗi lấy danh sách Category:", error);
+    }
+  };
+
+  // CẬP NHẬT useEffect: Gọi cả 2 hàm khi mở trang
+  useEffect(() => {
+    fetchTopicsPageData();
+    fetchCategoriesList(); // Bổ sung dòng này
   }, []);
 
   const categoryFilterOptions = useMemo(() => {
@@ -95,6 +110,7 @@ const Topics = () => {
       name: "",
       categoryId: "",
       description: "",
+      isActive: true, 
     });
   };
 
@@ -120,6 +136,7 @@ const Topics = () => {
       name: topic.name || "",
       categoryId: matchedCategory ? String(matchedCategory.id) : "",
       description: topic.description || "",
+      isActive: topic.status?.toLowerCase() === "active" || topic.isActive === true, 
     });
 
     setSubmitError("");
@@ -134,10 +151,16 @@ const Topics = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleStatusChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      isActive: e.target.value === "true",
     }));
   };
 
@@ -165,7 +188,7 @@ const Topics = () => {
         name: formData.name.trim(),
         categoryId: parsedCategoryId,
         description: formData.description.trim() || "",
-        isActive: true,
+        isActive: formData.isActive, 
       };
 
       console.log("Create topic payload:", payload);
@@ -222,7 +245,7 @@ const Topics = () => {
         name: formData.name.trim(),
         categoryId: parsedCategoryId,
         description: formData.description.trim() || "",
-        isActive: true,
+        isActive: formData.isActive, 
       };
 
       console.log("Update topic payload:", payload);
@@ -404,12 +427,12 @@ const Topics = () => {
                   <td>
                     <span
                       className={`status-pill ${
-                        topic.status?.toLowerCase() === "active"
+                        topic.status?.toLowerCase() === "active" || topic.isActive
                           ? "active"
                           : "inactive"
                       }`}
                     >
-                      {topic.status}
+                      {topic.status || (topic.isActive ? "Active" : "Inactive")}
                     </span>
                   </td>
 
@@ -440,6 +463,7 @@ const Topics = () => {
         </table>
       </div>
 
+      {/* ===================== MODAL ADD TOPIC ===================== */}
       {isAddModalOpen && (
         <div className="topic-modal-overlay" onClick={handleCloseAddModal}>
           <div className="topic-modal" onClick={(e) => e.stopPropagation()}>
@@ -486,6 +510,19 @@ const Topics = () => {
                 </select>
               </div>
 
+              {/* MỚI THÊM: Ô CHỌN STATUS (ADD) */}
+              <div className="topic-form-group">
+                <label>Status</label>
+                <select
+                  name="isActive"
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={handleStatusChange}
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+
               <div className="topic-form-group full-width">
                 <label>Description</label>
                 <textarea
@@ -523,6 +560,7 @@ const Topics = () => {
         </div>
       )}
 
+      {/* ===================== MODAL EDIT TOPIC ===================== */}
       {isEditModalOpen && (
         <div className="topic-modal-overlay" onClick={handleCloseEditModal}>
           <div className="topic-modal" onClick={(e) => e.stopPropagation()}>
@@ -566,6 +604,19 @@ const Topics = () => {
                       {category.name}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {/* MỚI THÊM: Ô CHỌN STATUS (EDIT) */}
+              <div className="topic-form-group">
+                <label>Status</label>
+                <select
+                  name="isActive"
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={handleStatusChange}
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
                 </select>
               </div>
 

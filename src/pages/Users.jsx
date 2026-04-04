@@ -203,17 +203,11 @@ const Users = () => {
         isActive: formData.isActive,
       };
 
-      console.log("Create payload:", payload);
-
       await createUser(payload);
       await fetchUsersPageData();
       handleCloseAddModal();
     } catch (err) {
-      console.error("Create user error:", err);
-      console.log("Create user response:", err?.response?.data);
-
       const errors = err?.response?.data?.errors;
-
       setSubmitError(
         errors?.PasswordHash?.[0] ||
           errors?.Department?.[0] ||
@@ -221,7 +215,6 @@ const Users = () => {
           errors?.Email?.[0] ||
           errors?.FullName?.[0] ||
           err?.response?.data?.message ||
-          err?.response?.data?.title ||
           "Failed to create user."
       );
     } finally {
@@ -269,17 +262,11 @@ const Users = () => {
         payload.passwordHash = formData.passwordHash.trim();
       }
 
-      console.log("Update payload:", payload);
-
       await updateUser(formData.id, payload);
       await fetchUsersPageData();
       handleCloseEditModal();
     } catch (err) {
-      console.error("Update user error:", err);
-      console.log("Update user response:", err?.response?.data);
-
       const errors = err?.response?.data?.errors;
-
       setSubmitError(
         errors?.PasswordHash?.[0] ||
           errors?.Department?.[0] ||
@@ -287,7 +274,6 @@ const Users = () => {
           errors?.Email?.[0] ||
           errors?.FullName?.[0] ||
           err?.response?.data?.message ||
-          err?.response?.data?.title ||
           "Failed to update user."
       );
     } finally {
@@ -307,12 +293,7 @@ const Users = () => {
       await deleteUser(user.id);
       await fetchUsersPageData();
     } catch (err) {
-      console.error(err);
-      alert(
-        err?.response?.data?.message ||
-          err?.response?.data?.title ||
-          "Failed to delete user."
-      );
+      alert(err?.response?.data?.message || "Failed to delete user.");
     } finally {
       setDeleteLoadingId(null);
     }
@@ -451,12 +432,12 @@ const Users = () => {
                   <td>
                     <span
                       className={`status-badge ${
-                        user.status?.toLowerCase() === "active"
+                        user.status?.toLowerCase() === "active" || user.isActive
                           ? "active"
                           : "inactive"
                       }`}
                     >
-                      {user.status}
+                      {user.status || (user.isActive ? "Active" : "Inactive")}
                     </span>
                   </td>
 
@@ -487,6 +468,7 @@ const Users = () => {
         </table>
       </div>
 
+      {/* ================= MODAL ADD USER ================= */}
       {isAddModalOpen && (
         <div className="user-modal-overlay" onClick={handleCloseAddModal}>
           <div className="user-modal" onClick={(e) => e.stopPropagation()}>
@@ -571,9 +553,22 @@ const Users = () => {
                 </select>
               </div>
 
+              {/* MỚI THÊM: Ô CHỌN STATUS */}
+              <div className="user-form-group">
+                <label>Status</label>
+                <select
+                  name="isActive"
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={handleStatusChange}
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+
               {submitError && <div className="user-form-error">{submitError}</div>}
 
-              <div className="user-form-actions">
+              <div className="user-form-actions" style={{ gridColumn: '1 / -1' }}>
                 <button
                   type="button"
                   className="user-cancel-btn"
@@ -595,6 +590,7 @@ const Users = () => {
         </div>
       )}
 
+      {/* ================= MODAL EDIT USER ================= */}
       {isEditModalOpen && (
         <div className="user-modal-overlay" onClick={handleCloseEditModal}>
           <div className="user-modal" onClick={(e) => e.stopPropagation()}>
@@ -679,9 +675,22 @@ const Users = () => {
                 </select>
               </div>
 
+              {/* MỚI THÊM: Ô CHỌN STATUS */}
+              <div className="user-form-group">
+                <label>Status</label>
+                <select
+                  name="isActive"
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={handleStatusChange}
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+
               {submitError && <div className="user-form-error">{submitError}</div>}
 
-              <div className="user-form-actions">
+              <div className="user-form-actions" style={{ gridColumn: '1 / -1' }}>
                 <button
                   type="button"
                   className="user-cancel-btn"

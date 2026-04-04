@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { getCategories, createCategory, deleteCategory, updateCategory } from '../services/categoryService';
-import { Folder, Search, Edit2, Trash2, Plus } from 'lucide-react'; // Dùng icon xịn xò
-import './Dashboard.css'; // Sửa lại đường dẫn này nếu file CSS của bạn nằm ở chỗ khác nhé!
+import { Folder, Search, Edit2, Trash2, Plus } from 'lucide-react'; 
+import './Dashboard.css'; 
 
 const CategoryPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState(""); // Bộ nhớ cho ô tìm kiếm
+    const [searchTerm, setSearchTerm] = useState(""); 
     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [newName, setNewName] = useState("");
     const [newDesc, setNewDesc] = useState("");
+    // 1. THÊM STATE ĐỂ LƯU TRẠNG THÁI ACTIVE/INACTIVE
+    const [newIsActive, setNewIsActive] = useState(true);
 
     useEffect(() => {
         fetchData();
@@ -31,7 +33,9 @@ const CategoryPage = () => {
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
-            const payload = { name: newName, description: newDesc, isActive: true };
+            // 2. TRUYỀN GIÁ TRỊ isActive VÀO PAYLOAD ĐỂ GỬI LÊN C#
+            const payload = { name: newName, description: newDesc, isActive: newIsActive };
+            
             if (editingId) {
                 payload.id = editingId;
                 await updateCategory(editingId, payload);
@@ -40,8 +44,10 @@ const CategoryPage = () => {
             }
             setIsModalOpen(false);
             setEditingId(null);
-            setNewName(""); setNewDesc("");
-            fetchData(); // Tải lại dữ liệu
+            setNewName(""); 
+            setNewDesc("");
+            setNewIsActive(true); // Reset lại trạng thái mặc định
+            fetchData(); 
         } catch (error) {
             alert("An error occurred! Please check your input.");
         }
@@ -62,14 +68,14 @@ const CategoryPage = () => {
         setEditingId(category.id);
         setNewName(category.name);
         setNewDesc(category.description || "");
+        // 3. NẠP DỮ LIỆU STATUS CŨ VÀO FORM KHI BẤM EDIT
+        setNewIsActive(category.isActive); 
         setIsModalOpen(true);
     };
 
-    // --- CÁC HÀM TÍNH TOÁN DỮ LIỆU TỰ ĐỘNG CHO GIAO DIỆN ---
     const filteredCategories = categories.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
     const totalCategories = categories.length;
     const activeCategories = categories.filter(c => c.isActive).length;
-    // Tính tổng Idea (nếu Backend có trả về biến ideaCount, nếu không thì tạm để 0)
     const totalIdeas = categories.reduce((sum, c) => sum + (c.ideaCount || 0), 0); 
 
     if (loading) return <div className="dashboard-container">Đang tải dữ liệu...</div>;
@@ -84,7 +90,13 @@ const CategoryPage = () => {
                 </div>
                 <button 
                     className="btn-primary"
-                    onClick={() => { setEditingId(null); setNewName(""); setNewDesc(""); setIsModalOpen(true); }}
+                    onClick={() => { 
+                        setEditingId(null); 
+                        setNewName(""); 
+                        setNewDesc(""); 
+                        setNewIsActive(true); // Đảm bảo Add mới luôn mặc định là Active
+                        setIsModalOpen(true); 
+                    }}
                 >
                     <Plus size={18} /> Add Category
                 </button>
@@ -176,10 +188,25 @@ const CategoryPage = () => {
                                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category Name</label>
                                 <input type="text" required value={newName} onChange={(e) => setNewName(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', boxSizing: 'border-box' }} />
                             </div>
-                            <div style={{ marginBottom: '20px' }}>
+                            
+                            <div style={{ marginBottom: '15px' }}>
                                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
                                 <textarea rows="3" required value={newDesc} onChange={(e) => setNewDesc(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}></textarea>
                             </div>
+
+                            {/* 4. GIAO DIỆN Ô CHỌN STATUS */}
+                            <div style={{ marginBottom: '25px' }}>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+                                <select 
+                                    value={newIsActive ? "true" : "false"} 
+                                    onChange={(e) => setNewIsActive(e.target.value === "true")}
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}
+                                >
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                </select>
+                            </div>
+
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                                 <button type="button" onClick={() => setIsModalOpen(false)} style={{ padding: '8px 15px', borderRadius: '6px', border: '1px solid #d1d5db', backgroundColor: 'white', cursor: 'pointer' }}>Cancel</button>
                                 <button type="submit" className="btn-primary">Save Category</button>
