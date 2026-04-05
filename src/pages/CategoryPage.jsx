@@ -12,7 +12,7 @@ const CategoryPage = () => {
     const [editingId, setEditingId] = useState(null);
     const [newName, setNewName] = useState("");
     const [newDesc, setNewDesc] = useState("");
-    // 1. THÊM STATE ĐỂ LƯU TRẠNG THÁI ACTIVE/INACTIVE
+
     const [newIsActive, setNewIsActive] = useState(true);
 
     useEffect(() => {
@@ -33,7 +33,6 @@ const CategoryPage = () => {
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
-            // 2. TRUYỀN GIÁ TRỊ isActive VÀO PAYLOAD ĐỂ GỬI LÊN C#
             const payload = { name: newName, description: newDesc, isActive: newIsActive };
             
             if (editingId) {
@@ -46,7 +45,7 @@ const CategoryPage = () => {
             setEditingId(null);
             setNewName(""); 
             setNewDesc("");
-            setNewIsActive(true); // Reset lại trạng thái mặc định
+            setNewIsActive(true); 
             fetchData(); 
         } catch (error) {
             alert("An error occurred! Please check your input.");
@@ -68,7 +67,7 @@ const CategoryPage = () => {
         setEditingId(category.id);
         setNewName(category.name);
         setNewDesc(category.description || "");
-        // 3. NẠP DỮ LIỆU STATUS CŨ VÀO FORM KHI BẤM EDIT
+
         setNewIsActive(category.isActive); 
         setIsModalOpen(true);
     };
@@ -94,7 +93,7 @@ const CategoryPage = () => {
                         setEditingId(null); 
                         setNewName(""); 
                         setNewDesc(""); 
-                        setNewIsActive(true); // Đảm bảo Add mới luôn mặc định là Active
+                        setNewIsActive(true); 
                         setIsModalOpen(true); 
                     }}
                 >
@@ -194,7 +193,6 @@ const CategoryPage = () => {
                                 <textarea rows="3" required value={newDesc} onChange={(e) => setNewDesc(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}></textarea>
                             </div>
 
-                            {/* 4. GIAO DIỆN Ô CHỌN STATUS */}
                             <div style={{ marginBottom: '25px' }}>
                                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
                                 <select 

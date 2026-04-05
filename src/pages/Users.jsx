@@ -553,7 +553,6 @@ const Users = () => {
                 </select>
               </div>
 
-              {/* MỚI THÊM: Ô CHỌN STATUS */}
               <div className="user-form-group">
                 <label>Status</label>
                 <select
@@ -675,7 +674,6 @@ const Users = () => {
                 </select>
               </div>
 
-              {/* MỚI THÊM: Ô CHỌN STATUS */}
               <div className="user-form-group">
                 <label>Status</label>
                 <select
