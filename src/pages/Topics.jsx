@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search, Plus, Hash, Pencil, Trash2, X } from "lucide-react";
+import { Search, Plus, Hash, Pencil, Trash2, X, Download, Loader2 } from "lucide-react"; // THÊM Download, Loader2
 import {
   getTopicsPageData,
   createTopic,
@@ -27,6 +27,7 @@ const Topics = () => {
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [exportLoadingId, setExportLoadingId] = useState(null); // MỚI: Trạng thái loading xoay xoay cho nút Export
   const [submitError, setSubmitError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -60,25 +61,18 @@ const Topics = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTopicsPageData();
-  }, []);
-
-  // HÀM MỚI: Đi lấy danh sách Category thật từ Backend
   const fetchCategoriesList = async () => {
     try {
       const data = await getCategories();
-      // Bóc tách dữ liệu giống như cách bạn làm ở trang CategoryPage
       setCategoriesData(data.categories || data.items || data);
     } catch (error) {
       console.error("Lỗi lấy danh sách Category:", error);
     }
   };
 
-  // CẬP NHẬT useEffect: Gọi cả 2 hàm khi mở trang
   useEffect(() => {
     fetchTopicsPageData();
-    fetchCategoriesList(); // Bổ sung dòng này
+    fetchCategoriesList();
   }, []);
 
   const categoryFilterOptions = useMemo(() => {
@@ -164,6 +158,88 @@ const Topics = () => {
     }));
   };
 
+  // ==============================================================
+  // CÁC HÀM PHỤ TRỢ: CHUYỂN JSON SANG CSV VÀ TẢI FILE 
+  // (Mượn từ trang ExportData sang)
+  // ==============================================================
+  const convertToCSV = (objArray) => {
+    const array = typeof objArray !== 'object' ? JSON.parse(objArray) : (Array.isArray(objArray) ? objArray : [objArray]);
+    if (!array || !array.length) return '';
+
+    const headers = Object.keys(array[0]);
+    let str = headers.join(',') + '\r\n';
+
+    for (let i = 0; i < array.length; i++) {
+        let line = '';
+        for (let index in array[i]) {
+            if (line !== '') line += ',';
+            let cellValue = array[i][index] === null || array[i][index] === undefined ? "" : array[i][index];
+            if (typeof cellValue === 'object') cellValue = JSON.stringify(cellValue);
+            line += `"${String(cellValue).replace(/"/g, '""')}"`; 
+        }
+        str += line + '\r\n';
+    }
+    return str;
+  };
+
+  const downloadFile = (content, fileName) => {
+    const blob = new Blob(["\uFEFF" + content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${fileName}_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // MỚI THÊM: Hàm xử lý sự kiện bấm nút Export trên từng hàng
+  // HÀM ĐÃ ĐƯỢC NÂNG CẤP ĐỂ FIX LỖI TÌM DỮ LIỆU
+  const handleExportTopicIdeas = async (topic) => {
+    if (topic.ideaCount === 0) {
+      alert(`Topic "${topic.name}" hiện không có ý tưởng nào để xuất file!`);
+      return;
+    }
+
+    try {
+      setExportLoadingId(topic.id);
+      
+      const response = await fetch("https://localhost:7047/api/Ideas");
+      if (!response.ok) throw new Error("Không thể kết nối đến máy chủ.");
+      const data = await response.json();
+      
+      // Bóc tách mảng dữ liệu (Thêm fallback an toàn)
+      let allIdeas = data.items || data.ideas || data.data || data; 
+      if (!Array.isArray(allIdeas)) {
+          allIdeas = Object.values(data).find(val => Array.isArray(val)) || [];
+      }
+
+      // Lọc thông minh: So sánh bằng cả ID lẫn TÊN
+      const topicIdeas = allIdeas.filter(idea => 
+        String(idea.topicId) === String(topic.id) || 
+        String(idea.TopicId) === String(topic.id) ||
+        idea.topicName === topic.name ||
+        idea.TopicName === topic.name
+      );
+
+      if (topicIdeas.length === 0) {
+         console.log("Dữ liệu Idea mẫu tải về:", allIdeas[0]); // Log ra để kiểm tra
+         alert(`Dữ liệu Idea thuộc về Topic "${topic.name}" đang bị ẩn hoặc API chưa trả về trường TopicId/TopicName.`);
+         return;
+      }
+
+      const csvContent = convertToCSV(topicIdeas);
+      downloadFile(csvContent, `Ideas_Topic_${topic.name.replace(/\s+/g, '_')}`);
+
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Đã xảy ra lỗi khi trích xuất dữ liệu Idea!");
+    } finally {
+      setExportLoadingId(null);
+    }
+  };
+  // ==============================================================
+
   const handleAddTopic = async (e) => {
     e.preventDefault();
 
@@ -191,24 +267,16 @@ const Topics = () => {
         isActive: formData.isActive, 
       };
 
-      console.log("Create topic payload:", payload);
-
       await createTopic(payload);
       await fetchTopicsPageData();
       handleCloseAddModal();
     } catch (err) {
-      console.error("Create topic error:", err?.response?.data || err);
-
       const apiErrors = err?.response?.data?.errors;
       if (apiErrors) {
         const firstError = Object.values(apiErrors).flat()?.[0];
         setSubmitError(firstError || "Failed to create topic.");
       } else {
-        setSubmitError(
-          err?.response?.data?.message ||
-            err?.response?.data?.title ||
-            "Failed to create topic."
-        );
+        setSubmitError(err?.response?.data?.message || "Failed to create topic.");
       }
     } finally {
       setSubmitLoading(false);
@@ -248,24 +316,16 @@ const Topics = () => {
         isActive: formData.isActive, 
       };
 
-      console.log("Update topic payload:", payload);
-
       await updateTopic(parsedTopicId, payload);
       await fetchTopicsPageData();
       handleCloseEditModal();
     } catch (err) {
-      console.error("Update topic error:", err?.response?.data || err);
-
       const apiErrors = err?.response?.data?.errors;
       if (apiErrors) {
         const firstError = Object.values(apiErrors).flat()?.[0];
         setSubmitError(firstError || "Failed to update topic.");
       } else {
-        setSubmitError(
-          err?.response?.data?.message ||
-            err?.response?.data?.title ||
-            "Failed to update topic."
-        );
+        setSubmitError(err?.response?.data?.message || "Failed to update topic.");
       }
     } finally {
       setSubmitLoading(false);
@@ -284,12 +344,7 @@ const Topics = () => {
       await deleteTopic(topic.id);
       await fetchTopicsPageData();
     } catch (err) {
-      console.error("Delete topic error:", err?.response?.data || err);
-      alert(
-        err?.response?.data?.message ||
-          err?.response?.data?.title ||
-          "Failed to delete topic."
-      );
+      alert(err?.response?.data?.message || "Failed to delete topic.");
     } finally {
       setDeleteLoadingId(null);
     }
@@ -437,10 +492,11 @@ const Topics = () => {
                   </td>
 
                   <td>
-                    <div className="topic-actions">
+                    <div className="topic-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {/* NHÓM 1: CÁC NÚT THAO TÁC CƠ BẢN */}
                       <button
                         className="topic-action-btn edit"
-                        title="Edit"
+                        title="Edit Topic"
                         onClick={() => handleOpenEditModal(topic)}
                       >
                         <Pencil size={16} />
@@ -448,11 +504,29 @@ const Topics = () => {
 
                       <button
                         className="topic-action-btn delete"
-                        title="Delete"
+                        title="Delete Topic"
                         onClick={() => handleDeleteTopic(topic)}
                         disabled={deleteLoadingId === topic.id}
                       >
                         <Trash2 size={16} />
+                      </button>
+
+                      {/* VÁCH NGĂN: Ngăn cách bằng một đường kẻ mờ */}
+                      <div style={{ width: '1px', height: '24px', backgroundColor: '#cbd5e1', margin: '0 4px' }}></div>
+
+                      {/* NHÓM 2: NÚT EXPORT RIÊNG BIỆT BÊN NGOÀI */}
+                      <button
+                        className="topic-action-btn"
+                        title="Export Ideas for this Topic"
+                        onClick={() => handleExportTopicIdeas(topic)}
+                        disabled={exportLoadingId === topic.id}
+                        style={{ 
+                          color: '#2563eb', 
+                          backgroundColor: '#eff6ff',
+                          border: '1px solid #bfdbfe' // Thêm cái viền mờ cho đẹp
+                        }}
+                      >
+                        {exportLoadingId === topic.id ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                       </button>
                     </div>
                   </td>
@@ -510,7 +584,6 @@ const Topics = () => {
                 </select>
               </div>
 
-              {/* MỚI THÊM: Ô CHỌN STATUS (ADD) */}
               <div className="topic-form-group">
                 <label>Status</label>
                 <select
@@ -607,7 +680,6 @@ const Topics = () => {
                 </select>
               </div>
 
-              {/* MỚI THÊM: Ô CHỌN STATUS (EDIT) */}
               <div className="topic-form-group">
                 <label>Status</label>
                 <select

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getDashboardSummary } from '../services/dashboardService';
-import { Lightbulb, Users, MessageSquare, Hash, UserPlus, FileText, CheckCircle, FolderPlus } from 'lucide-react';
+import { Lightbulb, Users, MessageSquare, Hash, UserPlus, FileText, CheckCircle, FolderPlus, Download, BarChart2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
@@ -39,7 +39,6 @@ const Dashboard = () => {
 
             {/* --- TOP 4 KPI CARDS --- */}
            <div className="kpi-grid">
-                {/* THẺ TOTAL IDEAS ĐÃ ĐƯỢC GẮN ONCLICK VÀ CURSOR POINTER */}
                 <div className="kpi-card" >
                     <div className="kpi-icon-wrapper bg-blue"><Lightbulb size={24} color="#fff" /></div>
                     <div className="kpi-info">
@@ -72,7 +71,6 @@ const Dashboard = () => {
 
             {/* --- MIDDLE SECTION: CHART & RECENT ACTIVITY --- */}
             <div className="middle-section">
-                {/* Biểu đồ Ideas by Department */}
                 <div className="chart-card">
                     <h3>Ideas by Department</h3>
                     <p className="subtitle">Distribution of ideas across departments</p>
@@ -89,7 +87,6 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Danh sách hoạt động gần đây */}
                 <div className="activity-card">
                     <h3>Recent Activity</h3>
                     <p className="subtitle">Latest system updates</p>
@@ -111,24 +108,51 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* --- BOTTOM SECTION: MANAGEMENT TOOLS (Static for now) --- */}
             <h3 className="section-title">Management Tools</h3>
             <div className="tools-grid">
+                
                 <div className="tool-card" onClick={() => navigate('/users')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-blue"><Users size={20} color="#2563eb" /></div>
                     <h4>Manage Users</h4>
-                    <p>Add, edit, and manage user accounts</p>
+                    <p>Add, edit, and manage user accounts and permissions</p>
                 </div>
+                
                 <div className="tool-card" onClick={() => navigate('/categories')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-green"><FolderPlus size={20} color="#16a34a" /></div>
                     <h4>Manage Categories</h4>
-                    <p>Organize idea categories</p>
+                    <p>Organize and maintain idea categories</p>
                 </div>
+                
                 <div className="tool-card" onClick={() => navigate('/topics')} style={{ cursor: 'pointer' }}>
                     <div className="tool-icon bg-light-purple"><Hash size={20} color="#9333ea" /></div>
                     <h4>Manage Topics</h4>
                     <p>Create and edit discussion topics</p>
                 </div>
+
+                <div className="tool-card" onClick={() => navigate('/ideas')} style={{ cursor: 'pointer' }}>
+                    <div className="tool-icon bg-light-orange" style={{ backgroundColor: '#ffedd5' }}>
+                        <Lightbulb size={20} color="#ea580c" />
+                    </div>
+                    <h4>Manage Ideas</h4>
+                    <p>Review, approve, and moderate submitted ideas</p>
+                </div>
+
+                <div className="tool-card" onClick={() => navigate('/export-data')} style={{ cursor: 'pointer' }}>
+                    <div className="tool-icon bg-light-slate" style={{ backgroundColor: '#f1f5f9' }}>
+                        <Download size={20} color="#475569" />
+                    </div>
+                    <h4>Export Data</h4>
+                    <p>Download system data and generate reports</p>
+                </div>
+
+                <div className="tool-card" onClick={() => navigate('/reports')} style={{ cursor: 'pointer' }}>
+                    <div className="tool-icon bg-light-teal" style={{ backgroundColor: '#ccfbf1' }}>
+                        <BarChart2 size={20} color="#0d9488" />
+                    </div>
+                    <h4>View Reports</h4>
+                    <p>Access analytics and detailed statistics</p>
+                </div>
+
             </div>
         </div>
     );
