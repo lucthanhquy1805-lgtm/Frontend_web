@@ -5,6 +5,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getDepartments
 } from "../services/usersService";
 import "./Users.css";
 
@@ -39,11 +40,7 @@ const Users = () => {
     isActive: true,
   });
 
-  const departmentsData = [
-    { id: 1, name: "Faculty of IT" },
-    { id: 2, name: "QA Department" },
-    { id: 3, name: "HR Department" },
-  ];
+  const [departmentsData, setDepartmentsData] = useState([]);
 
   const rolesData = [
     { id: 1, name: "Administrator" },
@@ -73,9 +70,18 @@ const Users = () => {
       setLoading(false);
     }
   };
+  const fetchDepartmentsData = async () => {
+    try {
+      const data = await getDepartments();
+      setDepartmentsData(data);
+    } catch (err) {
+      console.error("Failed to load departments.", err);
+    }
+  };
 
   useEffect(() => {
     fetchUsersPageData();
+    fetchDepartmentsData();
   }, []);
 
   const filteredUsers = useMemo(() => {

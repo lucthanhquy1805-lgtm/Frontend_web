@@ -21,3 +21,10 @@ export const deleteUser = async (id) => {
   const response = await axios.delete(`${API_URL}/${id}`);
   return response.data;
 };
+
+const DEPT_API_URL = "https://localhost:7047/api/Departments";
+
+export const getDepartments = async () => {
+  const response = await axios.get(DEPT_API_URL);
+  return response.data;
+};

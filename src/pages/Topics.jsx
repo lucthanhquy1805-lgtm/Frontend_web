@@ -462,7 +462,7 @@ const Topics = () => {
                       </div>
                       <div>
                         <div className="topic-name">{topic.name}</div>
-                        <div className="topic-id">ID: {topic.id}</div>
+                        {/* <div className="topic-id">ID: {topic.id}</div> */}
                       </div>
                     </div>
                   </td>
